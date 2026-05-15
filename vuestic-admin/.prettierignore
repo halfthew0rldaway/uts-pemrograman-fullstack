@@ -16,3 +16,6 @@ dist/**
 
 # Check subdirectories too
 !*/
+
+# apexchart tag must stay lowercase — Prettier capitalizes it which breaks the component
+src/pages/admin/dashboard/Dashboard.vue

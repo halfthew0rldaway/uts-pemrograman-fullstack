@@ -36,12 +36,8 @@
 
     <!-- CAPTCHA notice (dev bypass aktif) -->
     <div class="mb-4 p-3 rounded-lg bg-warning/10 border border-warning/30 text-sm text-warning-dark">
-      <span v-if="isDev">
-        🛠️ <strong>Dev Mode:</strong> CAPTCHA dilewati otomatis.
-      </span>
-      <span v-else>
-        🔒 Verifikasi CAPTCHA diperlukan untuk login.
-      </span>
+      <span v-if="isDev"> 🛠️ <strong>Dev Mode:</strong> CAPTCHA dilewati otomatis. </span>
+      <span v-else> 🔒 Verifikasi CAPTCHA diperlukan untuk login. </span>
     </div>
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
@@ -52,21 +48,12 @@
       {{ errorMessage }}
     </VaAlert>
 
-    <VaButton
-      class="w-full"
-      type="submit"
-      :loading="authStore.isLoading"
-      :disabled="authStore.isLoading"
-    >
+    <VaButton class="w-full" type="submit" :loading="authStore.isLoading" :disabled="authStore.isLoading">
       Login
     </VaButton>
 
     <div class="text-center mt-3">
-      <RouterLink
-        to="/auth/forgot-password"
-        class="text-sm"
-        style="color: var(--va-primary); text-decoration: none;"
-      >
+      <RouterLink to="/auth/forgot-password" class="text-sm" style="color: var(--va-primary); text-decoration: none">
         Lupa password?
       </RouterLink>
     </div>
@@ -104,12 +91,7 @@ const submit = async () => {
   // Gunakan "dev" sebagai captchaToken di development
   const captchaToken = isDev ? 'dev' : ''
 
-  const result = await authStore.login(
-    formData.email,
-    formData.password,
-    captchaToken,
-    formData.rememberMe,
-  )
+  const result = await authStore.login(formData.email, formData.password, captchaToken, formData.rememberMe)
 
   if (result.success) {
     // Gunakan replace agar tidak bisa back ke halaman login

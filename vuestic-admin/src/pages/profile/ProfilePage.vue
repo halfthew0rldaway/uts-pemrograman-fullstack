@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 text-sm p-3 rounded-lg bg-gray-50" style="background: rgba(0,0,0,0.03)">
+        <div class="grid grid-cols-2 gap-3 text-sm p-3 rounded-lg bg-gray-50" style="background: rgba(0, 0, 0, 0.03)">
           <div>
             <div class="text-secondary text-xs mb-1">Divisi</div>
             <div class="font-medium">{{ authStore.user?.division || '—' }}</div>
@@ -49,25 +49,14 @@
       <VaCardTitle>Perbarui Informasi Akun</VaCardTitle>
       <VaCardContent>
         <div class="flex flex-col gap-4">
-          <VaInput
-            v-model="profileForm.username"
-            label="Username"
-            placeholder="Username login"
-          />
-          <VaInput
-            v-model="profileForm.email"
-            label="Email"
-            type="email"
-            placeholder="Email akun"
-          />
+          <VaInput v-model="profileForm.username" label="Username" placeholder="Username login" />
+          <VaInput v-model="profileForm.email" label="Email" type="email" placeholder="Email akun" />
 
           <VaAlert v-if="profileSuccess" color="success" class="mt-1">{{ profileSuccess }}</VaAlert>
           <VaAlert v-if="profileError" color="danger" class="mt-1">{{ profileError }}</VaAlert>
 
           <div class="flex justify-end">
-            <VaButton :loading="isSavingProfile" @click="saveProfile">
-              Simpan Perubahan
-            </VaButton>
+            <VaButton :loading="isSavingProfile" @click="saveProfile"> Simpan Perubahan </VaButton>
           </div>
         </div>
       </VaCardContent>
@@ -101,9 +90,7 @@
           <VaAlert v-if="passwordError" color="danger" class="mt-1">{{ passwordError }}</VaAlert>
 
           <div class="flex justify-end">
-            <VaButton :loading="isSavingPassword" @click="savePassword">
-              Ganti Password
-            </VaButton>
+            <VaButton :loading="isSavingPassword" @click="savePassword"> Ganti Password </VaButton>
           </div>
         </div>
       </VaCardContent>
@@ -133,8 +120,11 @@ const passwordError = ref('')
 const formatDate = (d: string | null | undefined) => {
   if (!d) return '—'
   return new Date(d).toLocaleDateString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 

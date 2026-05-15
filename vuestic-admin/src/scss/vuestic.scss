@@ -110,8 +110,8 @@
 
   /* Header */
   thead tr {
-    border-bottom: 2px solid rgba(var(--va-primary-rgb, 59,130,246), 0.2);
-    background: rgba(var(--va-primary-rgb, 59,130,246), 0.04);
+    border-bottom: 2px solid rgba(var(--va-primary-rgb, 59, 130, 246), 0.2);
+    background: rgba(var(--va-primary-rgb, 59, 130, 246), 0.04);
   }
 
   thead th {
@@ -137,7 +137,7 @@
 
   /* Hover */
   &--hoverable tbody tr:hover {
-    background: rgba(var(--va-primary-rgb, 59,130,246), 0.06) !important;
+    background: rgba(var(--va-primary-rgb, 59, 130, 246), 0.06) !important;
   }
 
   tbody td {
@@ -146,24 +146,24 @@
   }
 }
 
-/* Dark mode table adjustments */
+/* Dark mode table adjustments — aligned with enterprise palette */
 .va-dark {
   .va-table {
     thead tr {
-      border-bottom-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.04);
+      border-bottom-color: #2a3441;
+      background: rgba(255, 255, 255, 0.03);
     }
 
     tbody tr {
-      border-bottom-color: rgba(255, 255, 255, 0.06);
+      border-bottom-color: #2a3441;
 
       &:nth-child(even) {
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(255, 255, 255, 0.02);
       }
     }
 
     &--hoverable tbody tr:hover {
-      background: rgba(255, 255, 255, 0.07) !important;
+      background: rgba(99, 102, 241, 0.07) !important;
     }
   }
 }

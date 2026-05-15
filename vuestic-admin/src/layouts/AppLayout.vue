@@ -9,7 +9,17 @@
     </template>
 
     <template #left>
-      <AppSidebar :minimized="isSidebarMinimized" :animated="!isMobile" :mobile="isMobile" />
+      <AppSidebar
+        :minimized="isSidebarMinimized"
+        :visible="!isMobile || !isSidebarMinimized"
+        :animated="!isMobile"
+        :mobile="isMobile"
+        @update:visible="
+          (v) => {
+            if (!v) isSidebarMinimized = true
+          }
+        "
+      />
     </template>
 
     <template #content>
@@ -55,7 +65,7 @@ const onResize = () => {
   isSidebarMinimized.value = breakpoints.mdDown
   isMobile.value = breakpoints.smDown
   isTablet.value = breakpoints.mdDown
-  sidebarMinimizedWidth.value = isMobile.value ? '0' : '4.5rem'
+  sidebarMinimizedWidth.value = '4.5rem'
   sidebarWidth.value = isTablet.value ? '100%' : '16rem'
 }
 

@@ -47,13 +47,15 @@ export const useEmployeeStore = defineStore('employee', () => {
   /**
    * @description Mengambil daftar karyawan dengan filter dan pagination.
    */
-  const fetchEmployees = async (params: {
-    page?: number
-    pageSize?: number
-    search?: string
-    division?: string
-    employment_status?: string
-  } = {}) => {
+  const fetchEmployees = async (
+    params: {
+      page?: number
+      pageSize?: number
+      search?: string
+      division?: string
+      employment_status?: string
+    } = {},
+  ) => {
     isLoading.value = true
     try {
       const { data } = await apiClient.get('/employees', { params })
@@ -134,8 +136,17 @@ export const useEmployeeStore = defineStore('employee', () => {
   }
 
   return {
-    employees, currentEmployee, pagination, divisions, isLoading,
-    fetchEmployees, fetchEmployee, createEmployee, updateEmployee,
-    deleteEmployee, fetchDivisions, exportEmployees,
+    employees,
+    currentEmployee,
+    pagination,
+    divisions,
+    isLoading,
+    fetchEmployees,
+    fetchEmployee,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+    fetchDivisions,
+    exportEmployees,
   }
 })

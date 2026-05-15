@@ -53,9 +53,7 @@
 
         <!-- Footer -->
         <div v-if="notifStore.notifications.length" class="notif-footer">
-          <VaButton preset="plain" size="small" color="secondary" @click="notifStore.clear()">
-            Hapus semua
-          </VaButton>
+          <VaButton preset="plain" size="small" color="secondary" @click="notifStore.clear()"> Hapus semua </VaButton>
         </div>
       </VaDropdownContent>
     </VaDropdown>
@@ -82,13 +80,15 @@ const formatTime = (date: Date) => {
 </script>
 
 <style scoped>
-.notification-btn { position: relative; }
+.notification-btn {
+  position: relative;
+}
 
 .notif-badge {
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #EF4444;
+  background: #ef4444;
   color: white;
   font-size: 9px;
   font-weight: 700;
@@ -115,7 +115,7 @@ const formatTime = (date: Date) => {
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px 8px;
-  border-bottom: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .notif-title {
@@ -146,12 +146,18 @@ const formatTime = (date: Date) => {
   padding: 10px 16px;
   cursor: pointer;
   transition: background 0.12s;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
   position: relative;
 }
-.notif-item:last-child { border-bottom: none; }
-.notif-item:hover { background: rgba(0,0,0,0.03); }
-.notif-item--unread { background: rgba(99,102,241,0.04); }
+.notif-item:last-child {
+  border-bottom: none;
+}
+.notif-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.notif-item--unread {
+  background: rgba(99, 102, 241, 0.04);
+}
 
 .notif-icon-wrap {
   width: 30px;
@@ -170,7 +176,10 @@ const formatTime = (date: Date) => {
   opacity: 1;
 }
 
-.notif-content { flex: 1; min-width: 0; }
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
 
 .notif-message {
   font-size: 0.8125rem;
@@ -188,14 +197,14 @@ const formatTime = (date: Date) => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #6366F1;
+  background: #6366f1;
   flex-shrink: 0;
   margin-top: 4px;
 }
 
 .notif-footer {
   padding: 8px 16px;
-  border-top: 1px solid rgba(0,0,0,0.06);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
   text-align: center;
 }
 </style>

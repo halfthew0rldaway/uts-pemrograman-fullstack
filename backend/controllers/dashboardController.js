@@ -18,6 +18,8 @@ export const getDashboardStats = async (req, res) => {
       [statusStats],
       [divisionStats],
       [recentEmployees],
+      [recruitmentByMonth],
+      [avgSalaryByDivision],
     ] = await Promise.all([
       // Total seluruh karyawan
       pool.execute('SELECT COUNT(*) AS total FROM employees'),
@@ -62,6 +64,31 @@ export const getDashboardStats = async (req, res) => {
          ORDER BY created_at DESC
          LIMIT 5`,
       ),
+
+      // Rekrutmen per bulan (semua data historis berdasarkan join_date)
+      pool.execute(
+        `SELECT
+           DATE_FORMAT(join_date, '%b %Y') AS month,
+           DATE_FORMAT(join_date, '%Y-%m') AS month_key,
+           COUNT(*) AS total
+         FROM employees
+         GROUP BY month_key, month
+         ORDER BY month_key ASC`,
+      ),
+
+      // Rata-rata gaji per divisi (top 6)
+      pool.execute(
+        `SELECT
+           division,
+           ROUND(AVG(salary), 0) AS avg_salary,
+           MIN(salary) AS min_salary,
+           MAX(salary) AS max_salary
+         FROM employees
+         WHERE salary > 0
+         GROUP BY division
+         ORDER BY avg_salary DESC
+         LIMIT 6`,
+      ),
     ])
 
     return res.status(200).json({
@@ -77,6 +104,8 @@ export const getDashboardStats = async (req, res) => {
         statusStats: statusStats,
         divisionStats: divisionStats,
         recentEmployees: recentEmployees,
+        recruitmentByMonth: recruitmentByMonth,
+        avgSalaryByDivision: avgSalaryByDivision,
       },
     })
   } catch (error) {

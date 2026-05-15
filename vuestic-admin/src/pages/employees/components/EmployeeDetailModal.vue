@@ -1,11 +1,5 @@
 <template>
-  <VaModal
-    v-model="isOpen"
-    title="Detail Karyawan"
-    size="large"
-    hide-default-actions
-    @close="$emit('close')"
-  >
+  <VaModal v-model="isOpen" title="Detail Karyawan" size="large" hide-default-actions @close="$emit('close')">
     <div v-if="isLoading" class="flex justify-center py-12">
       <VaProgressCircle indeterminate />
     </div>
@@ -36,40 +30,73 @@
         <div class="detail-section">
           <div class="detail-section-title">Informasi Pribadi</div>
           <div class="detail-rows">
-            <div class="detail-row"><span class="detail-key">Jenis Kelamin</span><span class="detail-val">{{ emp.gender }}</span></div>
-            <div class="detail-row"><span class="detail-key">Tanggal Lahir</span><span class="detail-val">{{ formatDate(emp.birth_date) }}</span></div>
-            <div class="detail-row"><span class="detail-key">Status Nikah</span><span class="detail-val">{{ emp.marital_status }}</span></div>
-            <div class="detail-row"><span class="detail-key">Pendidikan</span><span class="detail-val">{{ emp.education }}</span></div>
+            <div class="detail-row">
+              <span class="detail-key">Jenis Kelamin</span><span class="detail-val">{{ emp.gender }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Tanggal Lahir</span
+              ><span class="detail-val">{{ formatDate(emp.birth_date) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Status Nikah</span><span class="detail-val">{{ emp.marital_status }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Pendidikan</span><span class="detail-val">{{ emp.education }}</span>
+            </div>
           </div>
         </div>
 
         <div class="detail-section">
           <div class="detail-section-title">Kontak</div>
           <div class="detail-rows">
-            <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">{{ emp.email }}</span></div>
-            <div class="detail-row"><span class="detail-key">Telepon</span><span class="detail-val">{{ emp.phone_number }}</span></div>
-            <div class="detail-row"><span class="detail-key">Kontak Darurat</span><span class="detail-val">{{ emp.emergency_contact }}</span></div>
-            <div class="detail-row"><span class="detail-key">No. Darurat</span><span class="detail-val">{{ emp.emergency_phone }}</span></div>
+            <div class="detail-row">
+              <span class="detail-key">Email</span><span class="detail-val">{{ emp.email }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Telepon</span><span class="detail-val">{{ emp.phone_number }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Kontak Darurat</span><span class="detail-val">{{ emp.emergency_contact }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">No. Darurat</span><span class="detail-val">{{ emp.emergency_phone }}</span>
+            </div>
           </div>
         </div>
 
         <div class="detail-section">
           <div class="detail-section-title">Alamat</div>
           <div class="detail-rows">
-            <div class="detail-row"><span class="detail-key">Alamat</span><span class="detail-val">{{ emp.address }}</span></div>
-            <div class="detail-row"><span class="detail-key">Kota</span><span class="detail-val">{{ emp.city }}</span></div>
-            <div class="detail-row"><span class="detail-key">Provinsi</span><span class="detail-val">{{ emp.province }}</span></div>
-            <div class="detail-row"><span class="detail-key">Kode Pos</span><span class="detail-val">{{ emp.postal_code }}</span></div>
+            <div class="detail-row">
+              <span class="detail-key">Alamat</span><span class="detail-val">{{ emp.address }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Kota</span><span class="detail-val">{{ emp.city }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Provinsi</span><span class="detail-val">{{ emp.province }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Kode Pos</span><span class="detail-val">{{ emp.postal_code }}</span>
+            </div>
           </div>
         </div>
 
         <div class="detail-section">
           <div class="detail-section-title">Pekerjaan</div>
           <div class="detail-rows">
-            <div class="detail-row"><span class="detail-key">Divisi</span><span class="detail-val">{{ emp.division }}</span></div>
-            <div class="detail-row"><span class="detail-key">Jabatan</span><span class="detail-val">{{ emp.position }}</span></div>
-            <div class="detail-row"><span class="detail-key">Gaji</span><span class="detail-val">{{ formatSalary(emp.salary) }}</span></div>
-            <div class="detail-row"><span class="detail-key">Bergabung</span><span class="detail-val">{{ formatDate(emp.join_date) }}</span></div>
+            <div class="detail-row">
+              <span class="detail-key">Divisi</span><span class="detail-val">{{ emp.division }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Jabatan</span><span class="detail-val">{{ emp.position }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Gaji</span><span class="detail-val">{{ formatSalary(emp.salary) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-key">Bergabung</span><span class="detail-val">{{ formatDate(emp.join_date) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -98,7 +125,7 @@ const apiBase = 'http://localhost:5000'
 const isLoading = ref(true)
 const emp = ref<any>(null)
 
-const statusColor = (s: string) => ({ Active: 'success', Inactive: 'warning', Resigned: 'danger' }[s] || 'secondary')
+const statusColor = (s: string) => ({ Active: 'success', Inactive: 'warning', Resigned: 'danger' })[s] || 'secondary'
 const isOpen = ref(true)
 
 const formatDate = (d: string) => {
@@ -143,7 +170,9 @@ onMounted(async () => {
   gap: 20px;
 }
 @media (max-width: 640px) {
-  .detail-grid { grid-template-columns: 1fr; }
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
 }
 .detail-section-title {
   font-size: 0.7rem;
@@ -153,7 +182,11 @@ onMounted(async () => {
   opacity: 0.45;
   margin-bottom: 8px;
 }
-.detail-rows { display: flex; flex-direction: column; gap: 6px; }
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 .detail-row {
   display: flex;
   justify-content: space-between;
@@ -161,9 +194,18 @@ onMounted(async () => {
   gap: 8px;
   font-size: 0.8125rem;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
-.detail-row:last-child { border-bottom: none; }
-.detail-key { opacity: 0.5; font-weight: 500; flex-shrink: 0; }
-.detail-val { font-weight: 500; text-align: right; }
+.detail-row:last-child {
+  border-bottom: none;
+}
+.detail-key {
+  opacity: 0.5;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.detail-val {
+  font-weight: 500;
+  text-align: right;
+}
 </style>

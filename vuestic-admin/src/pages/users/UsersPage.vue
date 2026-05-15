@@ -66,11 +66,7 @@
               <tr v-for="user in store.users" :key="user.id">
                 <td>
                   <div class="flex items-center gap-3">
-                    <VaAvatar
-                      :fallback-text="user.username.charAt(0).toUpperCase()"
-                      size="small"
-                      color="primary"
-                    />
+                    <VaAvatar :fallback-text="user.username.charAt(0).toUpperCase()" size="small" color="primary" />
                     <div>
                       <div class="font-medium">{{ user.username }}</div>
                       <div class="text-xs text-secondary">{{ user.email }}</div>
@@ -88,13 +84,19 @@
                 <td>
                   <div class="flex gap-1 justify-center">
                     <VaButton
-                      preset="plain" icon="mso-visibility" size="small" color="secondary"
+                      preset="plain"
+                      icon="mso-visibility"
+                      size="small"
+                      color="secondary"
                       title="Lihat Detail"
                       @click="openDetail(user)"
                     />
                     <VaButton preset="plain" icon="mso-edit" size="small" @click="openModal(user)" />
                     <VaButton
-                      preset="plain" icon="mso-delete" size="small" color="danger"
+                      preset="plain"
+                      icon="mso-delete"
+                      size="small"
+                      color="danger"
                       @click="confirmDelete(user)"
                     />
                   </div>
@@ -102,11 +104,8 @@
               </tr>
               <!-- Filler rows untuk menjaga tinggi tabel konsisten -->
               <template v-if="!store.isLoading && store.users.length > 0">
-                <tr
-                  v-for="i in Math.max(0, 10 - store.users.length)"
-                  :key="'filler-' + i"
-                >
-                  <td colspan="6" style="height: 58px; border-bottom: 1px solid rgba(0,0,0,0.04);"></td>
+                <tr v-for="i in Math.max(0, 10 - store.users.length)" :key="'filler-' + i">
+                  <td colspan="6" style="height: 58px; border-bottom: 1px solid rgba(0, 0, 0, 0.04)"></td>
                 </tr>
               </template>
             </tbody>
@@ -132,16 +131,16 @@
       v-if="showDetail"
       :user="selectedDetailUser!"
       @close="showDetail = false"
-      @edit="(u) => { showDetail = false; openModal(u) }"
+      @edit="
+        (u) => {
+          showDetail = false
+          openModal(u)
+        }
+      "
     />
 
     <!-- Form Modal -->
-    <UserFormModal
-      v-if="showModal"
-      :user="selectedUser"
-      @close="showModal = false"
-      @saved="onSaved"
-    />
+    <UserFormModal v-if="showModal" :user="selectedUser" @close="showModal = false" @saved="onSaved" />
 
     <!-- Delete Confirm -->
     <VaModal
@@ -152,7 +151,10 @@
       :ok-loading="isDeleting"
       @ok="doDelete"
     >
-      <p>Hapus user <strong>{{ userToDelete?.username }}</strong>? Tindakan ini tidak dapat dibatalkan.</p>
+      <p>
+        Hapus user <strong>{{ userToDelete?.username }}</strong
+        >? Tindakan ini tidak dapat dibatalkan.
+      </p>
     </VaModal>
   </div>
 </template>
@@ -186,15 +188,23 @@ const debouncedFetch = () => {
   debounceTimer = setTimeout(() => fetchData(), 400)
 }
 
-const fetchData = () => store.fetchUsers({
-  page: currentPage.value, pageSize: 10,
-  search: filters.search || undefined,
-  role: filters.role || undefined,
-  status: filters.status || undefined,
-})
+const fetchData = () =>
+  store.fetchUsers({
+    page: currentPage.value,
+    pageSize: 10,
+    search: filters.search || undefined,
+    role: filters.role || undefined,
+    status: filters.status || undefined,
+  })
 
 const formatDate = (d: string) =>
-  new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+  new Date(d).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 
 const openModal = (user: User | null = null) => {
   selectedUser.value = user

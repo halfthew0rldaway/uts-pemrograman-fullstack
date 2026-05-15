@@ -10,23 +10,18 @@
       <!-- Foto Profil -->
       <div class="sm:col-span-2 flex items-center gap-4">
         <VaAvatar
-          :src="photoPreview || (employee?.profile_photo ? `${apiBase}/uploads/photos/${employee.profile_photo}` : undefined)"
+          :src="
+            photoPreview ||
+            (employee?.profile_photo ? `${apiBase}/uploads/photos/${employee.profile_photo}` : undefined)
+          "
           :fallback-text="formData.full_name?.charAt(0) || 'K'"
           size="large"
           color="primary"
         />
         <div>
           <label class="va-input-label block mb-1">Foto Profil</label>
-          <input
-            id="photo-upload"
-            type="file"
-            accept="image/jpeg,image/png"
-            class="hidden"
-            @change="onPhotoChange"
-          />
-          <VaButton preset="secondary" size="small" @click="triggerPhotoUpload">
-            Pilih Foto
-          </VaButton>
+          <input id="photo-upload" type="file" accept="image/jpeg,image/png" class="hidden" @change="onPhotoChange" />
+          <VaButton preset="secondary" size="small" @click="triggerPhotoUpload"> Pilih Foto </VaButton>
           <p class="text-xs text-secondary mt-1">JPEG atau PNG — maks 2MB</p>
         </div>
       </div>
@@ -45,12 +40,7 @@
         :options="['Male', 'Female']"
         :rules="[validators.required]"
       />
-      <VaDateInput
-        v-model="formData.birth_date"
-        label="Tanggal Lahir *"
-        :rules="[validators.required]"
-        manual-input
-      />
+      <VaDateInput v-model="formData.birth_date" label="Tanggal Lahir *" :rules="[validators.required]" manual-input />
       <VaSelect
         v-model="formData.marital_status"
         label="Status Pernikahan *"
@@ -91,8 +81,18 @@
           auto-grow
         />
       </div>
-      <VaInput v-model="formData.city" label="Kota *" :rules="[validators.required, (v) => v.length <= 100 || 'Maks 100 karakter']" maxlength="100" />
-      <VaInput v-model="formData.province" label="Provinsi *" :rules="[validators.required, (v) => v.length <= 100 || 'Maks 100 karakter']" maxlength="100" />
+      <VaInput
+        v-model="formData.city"
+        label="Kota *"
+        :rules="[validators.required, (v) => v.length <= 100 || 'Maks 100 karakter']"
+        maxlength="100"
+      />
+      <VaInput
+        v-model="formData.province"
+        label="Provinsi *"
+        :rules="[validators.required, (v) => v.length <= 100 || 'Maks 100 karakter']"
+        maxlength="100"
+      />
       <VaInput
         v-model="formData.postal_code"
         label="Kode Pos *"

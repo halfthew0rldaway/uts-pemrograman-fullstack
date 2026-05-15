@@ -8,7 +8,11 @@
         </div>
         <h1 class="forgot-title">Lupa Password</h1>
         <p class="forgot-sub">
-          {{ step === 'request' ? 'Masukkan email akun Anda untuk menerima instruksi reset password.' : 'Masukkan token dan password baru Anda.' }}
+          {{
+            step === 'request'
+              ? 'Masukkan email akun Anda untuk menerima instruksi reset password.'
+              : 'Masukkan token dan password baru Anda.'
+          }}
         </p>
       </div>
 
@@ -19,15 +23,16 @@
           label="Email"
           type="email"
           placeholder="email@perusahaan.com"
-          :rules="[v => !!v || 'Email wajib diisi', v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Format email tidak valid']"
+          :rules="[
+            (v) => !!v || 'Email wajib diisi',
+            (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) || 'Format email tidak valid',
+          ]"
           class="mb-4"
         >
           <template #prependInner><VaIcon name="mso-email" color="secondary" /></template>
         </VaInput>
 
-        <VaButton class="w-full" :loading="isLoading" @click="submitRequest">
-          Kirim Instruksi Reset
-        </VaButton>
+        <VaButton class="w-full" :loading="isLoading" @click="submitRequest"> Kirim Instruksi Reset </VaButton>
 
         <div v-if="devToken" class="dev-token-box mt-4">
           <div class="dev-token-label">🛠 Development Token</div>
@@ -42,27 +47,25 @@
           v-model="resetToken"
           label="Token Reset"
           placeholder="Tempel token dari email"
-          :rules="[v => !!v || 'Token wajib diisi']"
+          :rules="[(v) => !!v || 'Token wajib diisi']"
           class="mb-3"
         />
         <VaInput
           v-model="newPassword"
           label="Password Baru"
           type="password"
-          :rules="[v => !!v || 'Password wajib diisi', v => v.length >= 8 || 'Minimal 8 karakter']"
+          :rules="[(v) => !!v || 'Password wajib diisi', (v) => v.length >= 8 || 'Minimal 8 karakter']"
           class="mb-3"
         />
         <VaInput
           v-model="confirmPassword"
           label="Konfirmasi Password"
           type="password"
-          :rules="[v => !!v || 'Konfirmasi wajib diisi', v => v === newPassword || 'Password tidak cocok']"
+          :rules="[(v) => !!v || 'Konfirmasi wajib diisi', (v) => v === newPassword || 'Password tidak cocok']"
           class="mb-4"
         />
 
-        <VaButton class="w-full" :loading="isLoading" @click="submitReset">
-          Reset Password
-        </VaButton>
+        <VaButton class="w-full" :loading="isLoading" @click="submitReset"> Reset Password </VaButton>
       </VaForm>
 
       <!-- Step 3: Success -->
@@ -74,9 +77,7 @@
 
       <!-- Back to login -->
       <div v-if="step !== 'done'" class="text-center mt-4">
-        <RouterLink to="/auth/login" class="text-sm text-primary">
-          ← Kembali ke Login
-        </RouterLink>
+        <RouterLink to="/auth/login" class="text-sm text-primary"> ← Kembali ke Login </RouterLink>
       </div>
     </div>
   </div>
@@ -162,14 +163,14 @@ const goToLogin = () => router.push('/auth/login')
   background: var(--va-background-element);
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
 }
 
 .forgot-icon {
   width: 64px;
   height: 64px;
   border-radius: 16px;
-  background: rgba(99,102,241,0.1);
+  background: rgba(99, 102, 241, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,8 +191,8 @@ const goToLogin = () => router.push('/auth/login')
 }
 
 .dev-token-box {
-  background: rgba(245,158,11,0.08);
-  border: 1px solid rgba(245,158,11,0.3);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
   border-radius: 8px;
   padding: 12px;
 }
@@ -199,7 +200,7 @@ const goToLogin = () => router.push('/auth/login')
 .dev-token-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #F59E0B;
+  color: #f59e0b;
   margin-bottom: 6px;
 }
 

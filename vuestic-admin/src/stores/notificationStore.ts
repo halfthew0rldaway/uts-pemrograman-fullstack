@@ -57,8 +57,7 @@ export const useNotificationStore = defineStore('notifications', () => {
   const notifyDelete = (entity: string, name: string) =>
     push(`${entity} "${name}" berhasil dihapus`, 'mso-delete', 'danger')
 
-  const notifyLogin = (username: string) =>
-    push(`Selamat datang kembali, ${username}!`, 'mso-login', 'primary')
+  const notifyLogin = (username: string) => push(`Selamat datang kembali, ${username}!`, 'mso-login', 'primary')
 
   const notifyExport = (format: string) =>
     push(`Data berhasil diekspor ke format ${format.toUpperCase()}`, 'mso-download', 'info')

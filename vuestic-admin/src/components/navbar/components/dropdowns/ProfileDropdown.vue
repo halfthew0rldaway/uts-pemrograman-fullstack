@@ -6,7 +6,9 @@
           <span class="profile-dropdown__anchor min-w-max">
             <slot />
             <VaAvatar
-              :src="authStore.user?.profile_photo ? `${apiBase}/uploads/photos/${authStore.user.profile_photo}` : undefined"
+              :src="
+                authStore.user?.profile_photo ? `${apiBase}/uploads/photos/${authStore.user.profile_photo}` : undefined
+              "
               :fallback-text="authStore.user?.username?.charAt(0)?.toUpperCase() || 'U'"
               :size="32"
               color="primary"
@@ -31,25 +33,16 @@
         </div>
 
         <VaList>
-          <VaListItem
-            class="menu-item px-4 text-base cursor-pointer h-8"
-            :to="{ name: 'profile' }"
-          >
+          <VaListItem class="menu-item px-4 text-base cursor-pointer h-8" :to="{ name: 'profile' }">
             <VaIcon name="mso-account_circle" class="pr-1" color="secondary" />
             Profil Saya
           </VaListItem>
-          <VaListItem
-            class="menu-item px-4 text-base cursor-pointer h-8"
-            :to="{ name: 'settings' }"
-          >
+          <VaListItem class="menu-item px-4 text-base cursor-pointer h-8" :to="{ name: 'settings' }">
             <VaIcon name="mso-settings" class="pr-1" color="secondary" />
             Pengaturan
           </VaListItem>
           <VaListSeparator class="mx-3 my-2" />
-          <VaListItem
-            class="menu-item px-4 text-base cursor-pointer h-8 text-danger"
-            @click="handleLogout"
-          >
+          <VaListItem class="menu-item px-4 text-base cursor-pointer h-8 text-danger" @click="handleLogout">
             <VaIcon name="mso-logout" class="pr-1" color="danger" />
             <span class="text-danger">Logout</span>
           </VaListItem>

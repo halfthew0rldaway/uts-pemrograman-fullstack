@@ -6,18 +6,8 @@
     @close="$emit('close')"
   >
     <VaForm ref="form" class="flex flex-col gap-4 py-2">
-      <VaInput
-        v-model="formData.username"
-        label="Username *"
-        :rules="[validators.required]"
-        placeholder="johndoe"
-      />
-      <VaInput
-        v-model="formData.email"
-        label="Email *"
-        type="email"
-        :rules="[validators.required, validators.email]"
-      />
+      <VaInput v-model="formData.username" label="Username *" :rules="[validators.required]" placeholder="johndoe" />
+      <VaInput v-model="formData.email" label="Email *" type="email" :rules="[validators.required, validators.email]" />
       <VaInput
         v-model="formData.password"
         :label="isEdit ? 'Password Baru (kosongkan jika tidak diubah)' : 'Password *'"
@@ -82,16 +72,20 @@ const formData = reactive({
   employee_id: '',
 })
 
-watch(() => props.user, (u) => {
-  if (u) {
-    formData.username = u.username
-    formData.email = u.email
-    formData.password = ''
-    formData.role = u.role
-    formData.status = u.status
-    formData.employee_id = u.employee_id ? String(u.employee_id) : ''
-  }
-}, { immediate: true })
+watch(
+  () => props.user,
+  (u) => {
+    if (u) {
+      formData.username = u.username
+      formData.email = u.email
+      formData.password = ''
+      formData.role = u.role
+      formData.status = u.status
+      formData.employee_id = u.employee_id ? String(u.employee_id) : ''
+    }
+  },
+  { immediate: true },
+)
 
 const submit = async () => {
   if (!validate()) return

@@ -9,7 +9,12 @@
 
 body {
   @apply text-regularMedium;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -23,7 +28,10 @@ body {
 }
 
 /* Monospace untuk kode */
-code, kbd, samp, pre {
+code,
+kbd,
+samp,
+pre {
   font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   font-size: 0.875em;
 }
@@ -52,7 +60,8 @@ code, kbd, samp, pre {
   margin-bottom: 1.5rem;
 }
 
-.h3, .page-sub-title {
+.h3,
+.page-sub-title {
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
@@ -183,4 +192,489 @@ code, kbd, samp, pre {
   font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.25;
+}
+
+/* ============================================================
+   DARK MODE — PT Digital Nusantara HRMS
+   Scoped entirely to .va-dark — light mode is untouched.
+   Palette:
+     App bg:        #0D1117  (deep, low-noise base)
+     Sidebar:       #111827
+     Card bg:       #161F2E  (distinct from app bg)
+     Card hover:    #1C2A3A
+     Border:        rgba(148,163,184,0.08)  (subtle but visible)
+     Text primary:  #F8FAFC
+     Text secondary:#CBD5E1
+     Text muted:    #94A3B8
+   ============================================================ */
+
+.va-dark {
+  // Vuestic CSS custom properties — set on root so they cascade everywhere
+  --va-text-primary: #f8fafc;
+  --va-text-secondary: #cbd5e1;
+  --va-text-inverted: #0d1117;
+  --va-background-primary: #0d1117;
+  --va-background-secondary: #111827;
+  --va-background-element: #161f2e;
+  --va-background-border: rgba(148, 163, 184, 0.08);
+
+  // Dashboard scoped style CSS vars
+  --kpi-label-opacity: 1;
+  --kpi-label-color: #cbd5e1;
+  --kpi-sub-opacity: 1;
+  --kpi-sub-color: #94a3b8;
+  --chart-title-color: #f8fafc;
+  --chart-sub-opacity: 1;
+  --chart-sub-color: #94a3b8;
+
+  /* ----------------------------------------------------------
+     1. App-level background — clean, low-noise dark base
+     ---------------------------------------------------------- */
+  &,
+  .va-layout,
+  .va-layout__content {
+    background-color: #0d1117 !important;
+    // Remove any gradient/glass noise from the layout root
+    background-image: none !important;
+  }
+
+  /* ----------------------------------------------------------
+     2. Navbar
+     ---------------------------------------------------------- */
+  .va-navbar {
+    background-color: #111827 !important;
+    border-bottom: 1px solid #2a3441 !important;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4) !important;
+
+    // Logo / icon text
+    .va-navbar__left,
+    .va-navbar__right,
+    .va-navbar__center {
+      color: #f8fafc !important;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     3. Sidebar
+     ---------------------------------------------------------- */
+  .va-sidebar {
+    background-color: #111827 !important;
+    border-right: 1px solid rgba(148, 163, 184, 0.08) !important;
+
+    // All item text — improved readability
+    .va-sidebar-item__title,
+    .va-sidebar__item__title,
+    .va-sidebar-item-content__title {
+      color: #cbd5e1 !important;
+      font-weight: 500 !important;
+    }
+
+    // Icons default
+    .va-icon {
+      color: #94a3b8 !important;
+      opacity: 1 !important;
+    }
+
+    // Hover state
+    .va-sidebar-item:hover,
+    .va-sidebar__item:hover {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+      transition: background-color 0.15s ease !important;
+
+      .va-sidebar-item__title,
+      .va-sidebar__item__title,
+      .va-sidebar-item-content__title {
+        color: #f8fafc !important;
+      }
+
+      .va-icon {
+        color: #cbd5e1 !important;
+      }
+    }
+
+    // Active / selected item
+    .va-sidebar-item--active,
+    .va-sidebar__item--active {
+      background-color: rgba(99, 102, 241, 0.12) !important;
+      border-right: 2px solid #6366f1 !important;
+
+      .va-sidebar-item__title,
+      .va-sidebar__item__title,
+      .va-sidebar-item-content__title {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+      }
+
+      .va-icon {
+        color: #6366f1 !important;
+        opacity: 1 !important;
+      }
+    }
+  }
+
+  /* ----------------------------------------------------------
+     4. Cards — clearly separated from background
+     ---------------------------------------------------------- */
+  .va-card {
+    background-color: #161f2e !important;
+    border: 1px solid rgba(148, 163, 184, 0.08) !important;
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.18),
+      0 1px 3px rgba(0, 0, 0, 0.12) !important;
+    transition:
+      background-color 0.15s ease,
+      box-shadow 0.15s ease !important;
+
+    &:hover {
+      background-color: #1c2a3a !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28) !important;
+    }
+
+    // Card title text
+    .va-card__title,
+    .va-card-title {
+      color: #f8fafc !important;
+    }
+
+    // Card content text
+    .va-card__content {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     5. Typography — enterprise-grade contrast
+     ---------------------------------------------------------- */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .page-title,
+  .h1,
+  .h3,
+  .h5,
+  .block-title {
+    color: #f8fafc !important;
+  }
+
+  // Dashboard header title & date
+  .dashboard h1 {
+    color: #f8fafc !important;
+  }
+
+  // Only target plain prose — do NOT override Vuestic component internals
+  .va-card__content > p,
+  .dashboard p {
+    color: #cbd5e1;
+  }
+
+  // Ensure font-medium / font-semibold text inside cards is readable
+  .font-medium,
+  .font-semibold,
+  .font-bold {
+    color: #f8fafc;
+  }
+
+  // KPI value numbers — color is set inline via :style, keep brightness
+  .kpi-value {
+    filter: brightness(1.05);
+  }
+
+  // text-secondary utility class
+  .text-secondary {
+    color: #94a3b8 !important;
+    opacity: 1 !important;
+  }
+
+  // Sidebar item title element (VaSidebarItemTitle renders as this)
+  .va-sidebar {
+    .va-list-item-label,
+    .va-sidebar-item__title span,
+    span.va-sidebar-item-title {
+      color: #cbd5e1 !important;
+    }
+  }
+
+  // Table cell text
+  .va-table td {
+    color: #cbd5e1 !important;
+  }
+  .va-table th {
+    color: #94a3b8 !important;
+  }
+
+  // Avatar fallback text
+  .va-avatar {
+    color: #f8fafc !important;
+  }
+
+  // Badge text
+  .va-badge__text {
+    color: #f8fafc !important;
+  }
+
+  /* ----------------------------------------------------------
+     6. Tables
+     ---------------------------------------------------------- */
+  .va-table {
+    thead tr {
+      border-bottom-color: rgba(148, 163, 184, 0.1) !important;
+      background: rgba(255, 255, 255, 0.02) !important;
+    }
+
+    thead th {
+      color: #94a3b8 !important;
+    }
+
+    tbody tr {
+      border-bottom-color: rgba(148, 163, 184, 0.06) !important;
+      color: #cbd5e1 !important;
+
+      &:nth-child(even) {
+        background: rgba(255, 255, 255, 0.015) !important;
+      }
+    }
+
+    &--hoverable tbody tr:hover {
+      background: rgba(99, 102, 241, 0.08) !important;
+      color: #f8fafc !important;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     7. Inputs & Selects
+     ---------------------------------------------------------- */
+  .va-input-wrapper,
+  .va-select-anchor {
+    --va-input-wrapper-background: #1e293b;
+    --va-input-wrapper-border-color: #2a3441;
+    color: #f8fafc !important;
+  }
+
+  .va-input-label {
+    color: #64748b !important;
+  }
+
+  /* ----------------------------------------------------------
+     8. ApexCharts — comprehensive SVG-level dark mode fixes
+        Targets rendered SVG/HTML injected by ApexCharts that
+        cannot be controlled via chart options alone.
+     ---------------------------------------------------------- */
+
+  .apexcharts-canvas {
+    background: transparent !important;
+
+    // Kill ALL background rects ApexCharts injects
+    rect.apexcharts-plot-bg,
+    rect[class*='apexcharts-bg'],
+    svg > rect:first-child,
+    .apexcharts-inner rect,
+    .apexcharts-graphical rect {
+      fill: transparent !important;
+      stroke: none !important;
+    }
+
+    // Kill outer SVG border/outline
+    svg {
+      outline: none !important;
+      border: none !important;
+      overflow: visible !important;
+    }
+
+    // Axis labels — improved contrast
+    .apexcharts-xaxis-label text,
+    .apexcharts-yaxis-label text,
+    .apexcharts-xaxis text,
+    .apexcharts-yaxis text,
+    .apexcharts-xaxis-annotations text,
+    .apexcharts-yaxis-annotations text {
+      fill: #94a3b8 !important;
+    }
+
+    // Axis lines and ticks
+    .apexcharts-xaxis-tick,
+    .apexcharts-yaxis-tick {
+      stroke: rgba(148, 163, 184, 0.15) !important;
+    }
+
+    // Grid lines — subtle
+    .apexcharts-gridline {
+      stroke: rgba(148, 163, 184, 0.07) !important;
+    }
+
+    // Grid border
+    .apexcharts-grid-borders line,
+    .apexcharts-grid line {
+      stroke: rgba(148, 163, 184, 0.07) !important;
+    }
+
+    // Legend text — readable
+    .apexcharts-legend-text {
+      color: #cbd5e1 !important;
+      fill: #cbd5e1 !important;
+    }
+
+    // Legend markers — no white outline
+    .apexcharts-legend-marker {
+      outline: none !important;
+      border: none !important;
+    }
+
+    // Tooltip — dark styled
+    .apexcharts-tooltip {
+      background: #1a2535 !important;
+      border: 1px solid rgba(148, 163, 184, 0.12) !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+      color: #f8fafc !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+
+      .apexcharts-tooltip-title {
+        background: #1e2d3d !important;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+        padding: 6px 12px !important;
+      }
+
+      .apexcharts-tooltip-text,
+      .apexcharts-tooltip-y-group,
+      .apexcharts-tooltip-series-group {
+        color: #cbd5e1 !important;
+        padding: 4px 12px !important;
+      }
+
+      .apexcharts-tooltip-text-y-value {
+        color: #f8fafc !important;
+        font-weight: 600 !important;
+      }
+
+      .apexcharts-tooltip-marker {
+        border-radius: 50% !important;
+      }
+    }
+
+    // Crosshair / cursor line
+    .apexcharts-xcrosshairs,
+    .apexcharts-ycrosshairs {
+      stroke: rgba(148, 163, 184, 0.2) !important;
+    }
+
+    // Data labels (bar chart values above bars)
+    .apexcharts-datalabel,
+    .apexcharts-datalabels text,
+    .apexcharts-bar-label text {
+      fill: #cbd5e1 !important;
+    }
+
+    // Radial / donut center label
+    .apexcharts-datalabel-label,
+    .apexcharts-pie-label {
+      fill: #94a3b8 !important;
+    }
+
+    .apexcharts-datalabel-value {
+      fill: #f8fafc !important;
+    }
+
+    // ---- DONUT chart: kill white ring between segments ----
+    .apexcharts-pie-series path,
+    .apexcharts-donut-slice-0,
+    .apexcharts-donut-slice-1,
+    .apexcharts-donut-slice-2,
+    .apexcharts-donut-slice-3,
+    .apexcharts-donut-slice-4 {
+      stroke: #161f2e !important;
+      stroke-width: 2px !important;
+    }
+
+    // Donut hollow — must be transparent, not white
+    .apexcharts-pie .apexcharts-donut-hollow,
+    .apexcharts-donut-hollow {
+      fill: transparent !important;
+      stroke: none !important;
+    }
+
+    // ---- RADIAL BAR: kill white separator between arcs ----
+    .apexcharts-radialbar-slice-0,
+    .apexcharts-radialbar-slice-1,
+    .apexcharts-radialbar-slice-2,
+    .apexcharts-radialbar-slice-3 {
+      stroke: #161f2e !important;
+      stroke-width: 0 !important;
+    }
+
+    // Radial track (unfilled arc background)
+    .apexcharts-radialbar-track path,
+    .apexcharts-radialbar-track > path {
+      stroke: rgba(148, 163, 184, 0.08) !important;
+      fill: transparent !important;
+    }
+
+    // Radial bar filled arc — no white outline
+    .apexcharts-radialbar-area {
+      stroke-width: 0 !important;
+    }
+
+    // Area chart fill — no white border on gradient
+    .apexcharts-area-series .apexcharts-area {
+      stroke-width: 0 !important;
+    }
+
+    // Line/area markers — no white ring
+    .apexcharts-marker {
+      stroke-width: 1.5 !important;
+    }
+
+    // Kill any white outline on the entire chart wrapper
+    .apexcharts-svg {
+      outline: none !important;
+      border: none !important;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     9. Modals & Dropdowns
+     ---------------------------------------------------------- */
+  .va-modal__dialog {
+    background-color: #1e293b !important;
+    border: 1px solid #2a3441 !important;
+    color: #f8fafc !important;
+  }
+
+  .va-dropdown__content {
+    background-color: #1e293b !important;
+    border: 1px solid #2a3441 !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* ----------------------------------------------------------
+     10. Badges
+     ---------------------------------------------------------- */
+  .va-badge {
+    font-weight: 600 !important;
+  }
+
+  /* ----------------------------------------------------------
+     11. Scrollbar (Webkit)
+     ---------------------------------------------------------- */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a3441;
+    border-radius: 3px;
+
+    &:hover {
+      background: #374151;
+    }
+  }
 }

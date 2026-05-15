@@ -24,14 +24,7 @@
         >
           Export PDF
         </VaButton>
-        <VaButton
-          v-if="authStore.isAdmin"
-          icon="mso-add"
-          size="small"
-          @click="openModal()"
-        >
-          Tambah Karyawan
-        </VaButton>
+        <VaButton v-if="authStore.isAdmin" icon="mso-add" size="small" @click="openModal()"> Tambah Karyawan </VaButton>
       </div>
     </div>
 
@@ -93,9 +86,7 @@
                 </td>
               </tr>
               <tr v-else-if="!employeeStore.employees.length">
-                <td colspan="7" class="text-center py-8 text-secondary">
-                  Tidak ada data karyawan ditemukan
-                </td>
+                <td colspan="7" class="text-center py-8 text-secondary">Tidak ada data karyawan ditemukan</td>
               </tr>
               <tr v-for="emp in employeeStore.employees" :key="emp.id">
                 <td>
@@ -120,10 +111,7 @@
                 <td>{{ emp.division }}</td>
                 <td>{{ emp.position }}</td>
                 <td>
-                  <VaBadge
-                    :text="emp.employment_status"
-                    :color="statusColor(emp.employment_status)"
-                  />
+                  <VaBadge :text="emp.employment_status" :color="statusColor(emp.employment_status)" />
                 </td>
                 <td>{{ formatDate(emp.join_date) }}</td>
                 <td v-if="authStore.isAdmin">
@@ -136,12 +124,7 @@
                       title="Lihat Detail"
                       @click="openDetail(emp)"
                     />
-                    <VaButton
-                      preset="plain"
-                      icon="mso-edit"
-                      size="small"
-                      @click="openModal(emp)"
-                    />
+                    <VaButton preset="plain" icon="mso-edit" size="small" @click="openModal(emp)" />
                     <VaButton
                       preset="plain"
                       icon="mso-delete"
@@ -159,7 +142,7 @@
                   :key="'filler-' + i"
                   class="filler-row"
                 >
-                  <td colspan="7" style="height: 58px; border-bottom: 1px solid rgba(0,0,0,0.04);"></td>
+                  <td colspan="7" style="height: 58px; border-bottom: 1px solid rgba(0, 0, 0, 0.04)"></td>
                 </tr>
               </template>
             </tbody>
@@ -167,13 +150,9 @@
         </div>
 
         <!-- Pagination -->
-        <div
-          v-if="employeeStore.pagination"
-          class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4"
-        >
+        <div v-if="employeeStore.pagination" class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
           <span class="text-sm text-secondary">
-            Menampilkan {{ employeeStore.employees.length }} dari
-            {{ employeeStore.pagination.totalItems }} karyawan
+            Menampilkan {{ employeeStore.employees.length }} dari {{ employeeStore.pagination.totalItems }} karyawan
           </span>
           <VaPagination
             v-model="currentPage"
@@ -190,16 +169,16 @@
       v-if="showDetail"
       :employee-id="selectedDetailId!"
       @close="showDetail = false"
-      @edit="(emp) => { showDetail = false; openModal(emp) }"
+      @edit="
+        (emp) => {
+          showDetail = false
+          openModal(emp)
+        }
+      "
     />
 
     <!-- Modal Form -->
-    <EmployeeFormModal
-      v-if="showModal"
-      :employee="selectedEmployee"
-      @close="showModal = false"
-      @saved="onSaved"
-    />
+    <EmployeeFormModal v-if="showModal" :employee="selectedEmployee" @close="showModal = false" @saved="onSaved" />
 
     <!-- Confirm Delete Modal -->
     <VaModal
@@ -212,8 +191,8 @@
     >
       <p>
         Apakah Anda yakin ingin menghapus karyawan
-        <strong>{{ employeeToDelete?.full_name }}</strong>?
-        Tindakan ini tidak dapat dibatalkan.
+        <strong>{{ employeeToDelete?.full_name }}</strong
+        >? Tindakan ini tidak dapat dibatalkan.
       </p>
     </VaModal>
   </div>
@@ -282,7 +261,9 @@ const statusColor = (status: string) => {
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '-'
   return new Date(dateStr).toLocaleDateString('id-ID', {
-    day: '2-digit', month: 'short', year: 'numeric',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   })
 }
 
