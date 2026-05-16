@@ -250,20 +250,23 @@ cd uts-pemrograman-fullstack2
 
 ### 2. Setup Database
 
+Pastikan MySQL Anda sudah menyala (XAMPP/Laragon/Native). Ikuti urutan import berikut agar tidak terjadi error relasi:
+
 ```bash
-# Masuk ke MySQL
-mysql -u root -p
+# 1. Masuk ke MySQL dan buat database
+mysql -u root -p -e "CREATE DATABASE pt_digital_nusantara CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# Buat database
-CREATE DATABASE pt_digital_nusantara CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-EXIT;
+# 2. Import Schema Utama
+mysql -u root -p pt_digital_nusantara < backend/database/schema.sql
 
-# Import schema dan seed data
-mysql -u root pt_digital_nusantara < backend/database/schema.sql
+# 3. Import Tabel Activity Logs
+mysql -u root -p pt_digital_nusantara < backend/database/activity_logs.sql
 
-# Buat tabel activity logs
-mysql -u root pt_digital_nusantara < backend/database/activity_logs.sql
+# 4. Import Seed Data (Akun Admin & Contoh Karyawan)
+mysql -u root -p pt_digital_nusantara < backend/database/seeder.sql
 ```
+
+> **Tips Windows:** Jika perintah `mysql` tidak ditemukan, gunakan **XAMPP Shell** atau **Laragon Terminal**. Jika Anda menggunakan port custom (misal XAMPP di `3307`), tambahkan flag `-P 3307` di setiap perintah di atas.
 
 ### 3. Setup Backend
 
@@ -283,9 +286,39 @@ cp .env.example .env
 ```bash
 cd ../vuestic-admin
 
-# Install dependencies
-npm install
+# Install dependencies (Gunakan flag ini jika di Windows/Husky error)
+npm install --legacy-peer-deps --ignore-scripts
 ```
+
+---
+
+## Troubleshooting (Solusi Masalah Umum)
+
+Jika Anda menemui error saat setup, berikut adalah solusinya:
+
+### ❌ `'vite' is not recognized as an internal or external command`
+**Penyebab:** Instalasi `node_modules` gagal atau terhenti di tengah jalan (biasanya karena Husky).
+**Solusi:**
+1. Hapus folder `node_modules` jika ada.
+2. Jalankan perintah instalasi dengan mengabaikan script:
+   ```bash
+   npm install --legacy-peer-deps --ignore-scripts
+   ```
+
+### ❌ `husky - .git can't be found`
+**Penyebab:** Husky mencoba mencari folder `.git` tapi gagal karena struktur folder project.
+**Solusi:** Gunakan flag `--ignore-scripts` saat `npm install` seperti poin di atas. Anda tidak membutuhkan Husky hanya untuk menjalankan aplikasi secara lokal.
+
+### ❌ `Database connection failed: Access denied for user 'root'@'localhost'`
+**Penyebab:** Password MySQL di `.env` salah atau MySQL belum dijalankan.
+**Solusi:**
+1. Pastikan MySQL (XAMPP/Laragon) sudah **Running**.
+2. Cek file `backend/.env`, pastikan `DB_PASSWORD` sesuai dengan password MySQL Anda. Jika pakai XAMPP, biasanya dikosongkan (`DB_PASSWORD=`).
+3. Pastikan database `pt_digital_nusantara` sudah dibuat.
+
+### ❌ `ERESOLVE could not resolve dependency (pinia/vue mismatch)`
+**Penyebab:** Konflik versi antara Vue dan Pinia.
+**Solusi:** Tambahkan flag `--legacy-peer-deps` saat melakukan `npm install`.
 
 ---
 

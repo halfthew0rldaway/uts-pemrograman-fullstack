@@ -2,15 +2,6 @@
   <VaNavbar class="app-layout-navbar py-2 px-0">
     <template #left>
       <div class="left">
-        <Transition name="icon-fade" mode="out-in">
-          <VaIcon
-            color="primary"
-            :name="isSidebarMinimized ? 'menu' : 'close'"
-            size="24px"
-            style="margin-top: 3px; cursor: pointer"
-            @click="isSidebarMinimized = !isSidebarMinimized"
-          />
-        </Transition>
         <RouterLink to="/" aria-label="Visit home page">
           <VuesticLogo />
         </RouterLink>
@@ -23,18 +14,12 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useGlobalStore } from '../../stores/global-store'
 import AppNavbarActions from './components/AppNavbarActions.vue'
 import VuesticLogo from '../VuesticLogo.vue'
 
 defineProps({
   isMobile: { type: Boolean, default: false },
 })
-
-const GlobalStore = useGlobalStore()
-
-const { isSidebarMinimized } = storeToRefs(GlobalStore)
 </script>
 
 <style lang="scss" scoped>

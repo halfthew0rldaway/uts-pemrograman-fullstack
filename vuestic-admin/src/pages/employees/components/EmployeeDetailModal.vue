@@ -7,12 +7,26 @@
     <div v-else-if="emp" class="employee-detail">
       <!-- Header -->
       <div class="detail-header">
-        <VaAvatar
-          :src="emp.profile_photo ? `${apiBase}/uploads/photos/${emp.profile_photo}` : undefined"
-          :fallback-text="emp.full_name.charAt(0)"
-          size="64px"
-          color="primary"
-        />
+        <div class="relative">
+          <VaAvatar
+            :src="emp.profile_photo ? `${apiBase}/uploads/photos/${emp.profile_photo}` : undefined"
+            :fallback-text="emp.full_name.charAt(0)"
+            size="64px"
+            color="primary"
+          />
+          <!-- Tombol hapus foto profil dari server -->
+          <VaButton
+            v-if="authStore.isAdmin && emp.profile_photo"
+            preset="plain"
+            icon="mso-delete"
+            size="small"
+            color="danger"
+            class="delete-photo-btn"
+            title="Hapus foto profil dari server"
+            :loading="isDeletingPhoto"
+            @click.stop="confirmDeletePhoto"
+          />
+        </div>
         <div class="detail-header-info">
           <div class="detail-name">{{ emp.full_name }}</div>
           <div class="detail-position">{{ emp.position }} · {{ emp.division }}</div>
@@ -103,11 +117,33 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <VaButton preset="secondary" @click="$emit('close')">Tutup</VaButton>
-        <VaButton v-if="authStore.isAdmin" icon="mso-edit" @click="$emit('edit', emp)">Edit</VaButton>
+      <div class="flex justify-between items-center">
+        <div class="text-xs text-secondary">
+          <span v-if="emp.profile_photo" class="flex items-center gap-1">
+            <VaIcon name="mso-image" size="14px" />
+            {{ emp.profile_photo }}
+          </span>
+          <span v-else class="opacity-50">Tidak ada foto profil</span>
+        </div>
+        <div class="flex gap-2">
+          <VaButton preset="secondary" @click="$emit('close')">Tutup</VaButton>
+          <VaButton v-if="authStore.isAdmin" icon="mso-edit" @click="$emit('edit', emp)">Edit</VaButton>
+        </div>
       </div>
     </template>
+
+    <!-- Confirm Delete Photo Modal -->
+    <VaModal
+      v-model="showDeletePhotoModal"
+      title="Hapus Foto Profil"
+      ok-text="Ya, Hapus"
+      ok-color="danger"
+      cancel-text="Batal"
+      :ok-loading="isDeletingPhoto"
+      @ok="doDeletePhoto"
+    >
+      <p>Hapus foto profil <strong>{{ emp?.full_name }}</strong> dari server? File akan dihapus permanen.</p>
+    </VaModal>
   </VaModal>
 </template>
 
@@ -124,6 +160,8 @@ const authStore = useAuthStore()
 const apiBase = 'http://localhost:5000'
 const isLoading = ref(true)
 const emp = ref<any>(null)
+const isDeletingPhoto = ref(false)
+const showDeletePhotoModal = ref(false)
 
 const statusColor = (s: string) => ({ Active: 'success', Inactive: 'warning', Resigned: 'danger' })[s] || 'secondary'
 const isOpen = ref(true)
@@ -146,9 +184,40 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+const confirmDeletePhoto = () => {
+  showDeletePhotoModal.value = true
+}
+
+const doDeletePhoto = async () => {
+  if (!emp.value) return
+  isDeletingPhoto.value = true
+  try {
+    await apiClient.delete(`/employees/${emp.value.id}/photo`)
+    emp.value.profile_photo = null
+    showDeletePhotoModal.value = false
+  } catch (e: any) {
+    console.error('Gagal menghapus foto:', e.message)
+  } finally {
+    isDeletingPhoto.value = false
+  }
+}
 </script>
 
 <style scoped>
+.delete-photo-btn {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--va-background-element) !important;
+  border-radius: 50% !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: unset !important;
+  padding: 0 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
 .detail-header {
   display: flex;
   align-items: center;

@@ -1,0 +1,12 @@
+full_name,gender,birth_date,email,phone_number,address,city,province,postal_code,division,position,salary,join_date,employment_status,emergency_contact,emergency_phone,education,marital_status
+Budi Santoso,Male,1990-05-15,budi.santoso@ptdn.com,081234567890,"Jl. Merdeka No. 10, RT 01/02",Jakarta,DKI Jakarta,10110,Teknologi Informasi,Software Engineer,9500000,2022-01-10,Active,Siti Santoso,081234567891,S1 Teknik Informatika,Single
+  sari indah  ,female,15/06/1992,SARI.INDAH@ptdn.com,+62 812-3456-7890,"Jl. Sudirman No. 5",Bandung,jawa barat,40111,Pemasaran,Marketing Manager,12000000,01/03/2021,active,Budi Indah,0812-3456-7891,S2 Manajemen Pemasaran,married
+RIZKY PRATAMA,Male,1988/07/20,rizky.pratama@ptdn.com,08567890123,Jl. Gatot Subroto No. 99,Surabaya,Jawa Timur,60111,Keuangan,Finance Analyst,Rp 8.500.000,20-08-2020,Active,Dewi Pratama,085678901234,S1 Akuntansi,Single
+dewi kusuma,Female,1995-03-10,dewi.kusuma@ptdn.com,087654321098,"Jl. Ahmad Yani No. 7, Blok B",Yogyakarta,DI Yogyakarta,55111,Sumber Daya Manusia,HR Specialist,7800000,2023-06-01,Active,Agus Kusuma,087654321099,S1 Psikologi,Single
+Ahmad Fauzi,male,1985-11-25,ahmad.fauzi@ptdn.com,081122334455,Jl. Diponegoro No. 45,Medan,Sumatera Utara,20111,Operasional,Operations Manager,15000000,2019-04-15,Active,Fatimah Fauzi,081122334456,S1 Manajemen,Married
+linda wijaya,Female,1993-08-30,linda.wijaya@ptdn.com,089988776655,"Jl. Pahlawan No. 12",Semarang,Jawa Tengah,50111,Teknologi Informasi,UI/UX Designer,8200000,2022-09-01,Active,Hendra Wijaya,089988776656,S1 Desain Komunikasi Visual,Single
+,Male,1990-01-01,invalid@ptdn.com,081111111111,Jl. Test,Jakarta,DKI Jakarta,10110,IT,Dev,5000000,2023-01-01,Active,Test,081111111112,S1,Single
+Budi Santoso,Male,1990-05-15,budi.santoso@ptdn.com,081234567890,"Jl. Merdeka No. 10",Jakarta,DKI Jakarta,10110,IT,Dev,5000000,2023-01-01,Active,Test,081111111112,S1,Single
+Eko Prasetyo,Male,invalid-date,eko.prasetyo@ptdn.com,082233445566,Jl. Veteran No. 8,Malang,Jawa Timur,65111,Teknologi Informasi,Backend Developer,9000000,2023-03-01,Active,Sri Prasetyo,082233445567,S1 Ilmu Komputer,Single
+Nita Rahayu,Female,1997-12-05,nita-rahayu-not-valid-email,083344556677,Jl. Imam Bonjol No. 3,Makassar,Sulawesi Selatan,90111,Pemasaran,Digital Marketing,7500000,2024-01-15,Active,Rudi Rahayu,083344556678,S1 Komunikasi,Single
+Hendra Gunawan,Male,1991-04-18,hendra.gunawan@ptdn.com,084455667788,"Jl. Raya Bogor No. 200",Bogor,Jawa Barat,16111,Keuangan,Accountant,8000000,2021-07-01,resigned,Yuli Gunawan,084455667789,S1 Akuntansi,Married

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2">
+  <div class="flex items-center gap-2">
     <VaIconMenuCollapsed
       class="cursor-pointer"
       :class="{ 'x-flip': !isSidebarMinimized }"

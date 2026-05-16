@@ -40,8 +40,16 @@ const generateEmployeeCode = async () => {
  */
 export const getAllEmployees = async (req, res) => {
   try {
-    const { page, pageSize, search, division, employment_status } = req.query
+    const { page, pageSize, search, division, employment_status, orderBy, orderDir } = req.query
     const { limit, offset, page: currentPage, pageSize: size } = getPagination(page, pageSize)
+
+    // Whitelist kolom yang boleh di-sort (mencegah SQL injection)
+    const ALLOWED_SORT_FIELDS = [
+      'employee_code', 'full_name', 'division', 'position',
+      'employment_status', 'join_date', 'salary', 'created_at',
+    ]
+    const sortField = ALLOWED_SORT_FIELDS.includes(orderBy) ? orderBy : 'created_at'
+    const sortDir = orderDir === 'asc' ? 'ASC' : 'DESC'
 
     // Bangun kondisi WHERE secara dinamis
     const conditions = []
@@ -73,7 +81,7 @@ export const getAllEmployees = async (req, res) => {
     const totalItems = countRows[0].total
 
     // Query data utama
-    const [employees] = await pool.execute(
+    const [employees] = await pool.query(
       `SELECT
          e.id,
          e.employee_code,
@@ -94,7 +102,7 @@ export const getAllEmployees = async (req, res) => {
          e.created_at
        FROM employees e
        ${whereClause}
-       ORDER BY e.created_at DESC
+       ORDER BY e.${sortField} ${sortDir}
        LIMIT ? OFFSET ?`,
       [...queryParams, limit, offset],
     )
@@ -470,6 +478,63 @@ export const deleteEmployee = async (req, res) => {
       success: false,
       message: 'Gagal menghapus data karyawan',
     })
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Controller: DELETE foto profil karyawan dari server
+// ---------------------------------------------------------------------------
+
+/**
+ * @description Menghapus file foto profil karyawan dari server.
+ * Data karyawan tetap ada, hanya foto yang dihapus.
+ *
+ * @route   DELETE /api/employees/:id/photo
+ * @access  Private (adminOnly)
+ */
+export const deleteEmployeePhoto = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const [rows] = await pool.execute(
+      'SELECT id, full_name, profile_photo FROM employees WHERE id = ? LIMIT 1',
+      [id],
+    )
+
+    if (!rows[0]) {
+      return res.status(404).json({ success: false, message: 'Karyawan tidak ditemukan' })
+    }
+
+    const employee = rows[0]
+
+    if (!employee.profile_photo) {
+      return res.status(400).json({ success: false, message: 'Karyawan tidak memiliki foto profil' })
+    }
+
+    // Hapus file dari server
+    deleteFile(employee.profile_photo)
+
+    // Update DB: set profile_photo = NULL
+    await pool.execute(
+      'UPDATE employees SET profile_photo = NULL WHERE id = ?',
+      [id],
+    )
+
+    await logActivity({
+      userId: req.user?.id,
+      action: LOG_ACTIONS.UPDATE_EMPLOYEE,
+      target: `employee:${id}`,
+      details: { action: 'delete_photo', full_name: employee.full_name, file: employee.profile_photo },
+      ipAddress: getClientIP(req),
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: `Foto profil ${employee.full_name} berhasil dihapus dari server`,
+    })
+  } catch (error) {
+    console.error('❌ deleteEmployeePhoto error:', error.message)
+    return res.status(500).json({ success: false, message: 'Gagal menghapus foto profil' })
   }
 }
 

@@ -36,7 +36,7 @@ export const getAllUsers = async (req, res) => {
       params,
     )
 
-    const [users] = await pool.execute(
+    const [users] = await pool.query(
       `SELECT
          u.id, u.employee_id, u.username, u.email, u.role, u.status,
          u.last_login, u.created_at,

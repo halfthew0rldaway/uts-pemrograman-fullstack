@@ -40,7 +40,7 @@ export const getActivityLogs = async (req, res) => {
       params,
     )
 
-    const [logs] = await pool.execute(
+    const [logs] = await pool.query(
       `SELECT
          l.id,
          l.action,

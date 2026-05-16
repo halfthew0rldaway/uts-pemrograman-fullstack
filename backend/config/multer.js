@@ -68,11 +68,16 @@ const excelFileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.ms-excel',
+    'text/csv',
+    'application/csv',
+    'text/plain', // some OS sends CSV as text/plain
   ]
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  const ext = path.extname(file.originalname).toLowerCase()
+  const allowedExts = ['.xlsx', '.xls', '.csv']
+  if (allowedMimeTypes.includes(file.mimetype) || allowedExts.includes(ext)) {
     cb(null, true)
   } else {
-    cb(new Error('Format file tidak didukung. Gunakan file Excel (.xlsx atau .xls)'), false)
+    cb(new Error('Format file tidak didukung. Gunakan file Excel (.xlsx/.xls) atau CSV (.csv)'), false)
   }
 }
 

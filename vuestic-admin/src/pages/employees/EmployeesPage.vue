@@ -1,31 +1,34 @@
 <template>
   <div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="page-title font-bold">Manajemen Karyawan</h1>
-        <p class="text-secondary text-sm mt-1">PT Digital Nusantara — Data Karyawan</p>
-      </div>
-      <div class="flex gap-2 flex-wrap">
-        <VaButton
-          v-if="authStore.isAdmin"
-          preset="secondary"
-          icon="mso-download"
-          size="small"
-          @click="handleExport('excel')"
-        >
-          Export Excel
-        </VaButton>
-        <VaButton
-          v-if="authStore.isAdmin"
-          preset="secondary"
-          icon="mso-picture_as_pdf"
-          size="small"
-          @click="handleExport('pdf')"
-        >
-          Export PDF
-        </VaButton>
-        <VaButton v-if="authStore.isAdmin" icon="mso-add" size="small" @click="openModal()"> Tambah Karyawan </VaButton>
-      </div>
+    <div class="flex justify-end gap-2 mb-4">
+      <VaButton
+        v-if="authStore.isAdmin"
+        preset="secondary"
+        icon="mso-download"
+        size="small"
+        @click="handleExport('excel')"
+      >
+        Export Excel
+      </VaButton>
+      <VaButton
+        v-if="authStore.isAdmin"
+        preset="secondary"
+        icon="mso-picture_as_pdf"
+        size="small"
+        @click="handleExport('pdf')"
+      >
+        Export PDF
+      </VaButton>
+      <VaButton
+        v-if="authStore.isAdmin"
+        preset="secondary"
+        icon="mso-upload_file"
+        size="small"
+        @click="showImport = true"
+      >
+        Import Excel/CSV
+      </VaButton>
+      <VaButton v-if="authStore.isAdmin" icon="mso-add" size="small" @click="openModal()">Tambah Karyawan</VaButton>
     </div>
 
     <!-- Filter Bar -->
@@ -70,12 +73,30 @@
           <table class="va-table va-table--hoverable w-full">
             <thead>
               <tr>
-                <th>Kode</th>
-                <th>Nama Karyawan</th>
-                <th>Divisi</th>
-                <th>Jabatan</th>
-                <th>Status</th>
-                <th>Bergabung</th>
+                <th class="sortable-th" @click="setSort('employee_code')">
+                  Kode
+                  <VaIcon :name="sortIcon('employee_code')" size="14px" class="sort-icon" />
+                </th>
+                <th class="sortable-th" @click="setSort('full_name')">
+                  Nama Karyawan
+                  <VaIcon :name="sortIcon('full_name')" size="14px" class="sort-icon" />
+                </th>
+                <th class="sortable-th" @click="setSort('division')">
+                  Divisi
+                  <VaIcon :name="sortIcon('division')" size="14px" class="sort-icon" />
+                </th>
+                <th class="sortable-th" @click="setSort('position')">
+                  Jabatan
+                  <VaIcon :name="sortIcon('position')" size="14px" class="sort-icon" />
+                </th>
+                <th class="sortable-th" @click="setSort('employment_status')">
+                  Status
+                  <VaIcon :name="sortIcon('employment_status')" size="14px" class="sort-icon" />
+                </th>
+                <th class="sortable-th" @click="setSort('join_date')">
+                  Bergabung
+                  <VaIcon :name="sortIcon('join_date')" size="14px" class="sort-icon" />
+                </th>
                 <th class="text-center">Aksi</th>
               </tr>
             </thead>
@@ -180,11 +201,15 @@
     <!-- Modal Form -->
     <EmployeeFormModal v-if="showModal" :employee="selectedEmployee" @close="showModal = false" @saved="onSaved" />
 
+    <!-- Import Modal -->
+    <EmployeeImportModal v-if="showImport" @close="showImport = false" @imported="onImported" />
+
     <!-- Confirm Delete Modal -->
     <VaModal
       v-model="showDeleteModal"
       title="Konfirmasi Hapus"
       ok-text="Ya, Hapus"
+      ok-color="danger"
       cancel-text="Batal"
       :ok-loading="isDeleting"
       @ok="doDelete"
@@ -206,6 +231,7 @@ import { useAuthStore } from '../../stores/auth'
 import { useNotificationStore } from '../../stores/notificationStore'
 import EmployeeFormModal from './components/EmployeeFormModal.vue'
 import EmployeeDetailModal from './components/EmployeeDetailModal.vue'
+import EmployeeImportModal from './components/EmployeeImportModal.vue'
 
 const employeeStore = useEmployeeStore()
 const authStore = useAuthStore()
@@ -218,10 +244,31 @@ const currentPage = ref(1)
 const showModal = ref(false)
 const showDetail = ref(false)
 const showDeleteModal = ref(false)
+const showImport = ref(false)
 const isDeleting = ref(false)
 const selectedEmployee = ref<Employee | null>(null)
 const selectedDetailId = ref<number | null>(null)
 const employeeToDelete = ref<Employee | null>(null)
+
+// Sort state
+const sortField = ref('created_at')
+const sortDir = ref<'asc' | 'desc'>('desc')
+
+const sortIcon = (field: string) => {
+  if (sortField.value !== field) return 'mso-unfold_more'
+  return sortDir.value === 'asc' ? 'mso-keyboard_arrow_up' : 'mso-keyboard_arrow_down'
+}
+
+const setSort = (field: string) => {
+  if (sortField.value === field) {
+    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortField.value = field
+    sortDir.value = 'asc'
+  }
+  currentPage.value = 1
+  fetchData()
+}
 
 const filters = reactive({
   search: '',
@@ -246,6 +293,8 @@ const fetchData = async () => {
     search: filters.search || undefined,
     division: filters.division || undefined,
     employment_status: filters.employment_status || undefined,
+    orderBy: sortField.value,
+    orderDir: sortDir.value,
   })
 }
 
@@ -299,14 +348,30 @@ const doDelete = async () => {
   }
 }
 
-const onSaved = (empName?: string) => {
+const onSaved = async (empName?: string) => {
   showModal.value = false
-  fetchData()
   const isEdit = !!selectedEmployee.value
   const name = empName || 'Karyawan'
+
+  if (!isEdit) {
+    // Setelah tambah baru: hitung page terakhir berdasarkan total + 1
+    const currentTotal = employeeStore.pagination?.totalItems ?? 0
+    const pageSize = 10
+    const newTotal = currentTotal + 1
+    const lastPage = Math.ceil(newTotal / pageSize)
+    currentPage.value = lastPage
+  }
+
+  await fetchData()
+
   toast({ message: `Data ${name} berhasil disimpan`, color: 'success' })
   if (isEdit) notifStore.notifyUpdate('Karyawan', name)
   else notifStore.notifyCreate('Karyawan', name)
+}
+
+const onImported = () => {
+  fetchData()
+  toast({ message: 'Data karyawan berhasil diimport dan diperbarui', color: 'success' })
 }
 
 const handleExport = async (format: 'excel' | 'pdf') => {
@@ -325,3 +390,23 @@ onMounted(async () => {
   await Promise.all([fetchData(), employeeStore.fetchDivisions()])
 })
 </script>
+
+<style scoped>
+.sortable-th {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.sortable-th:hover {
+  opacity: 0.75;
+}
+.sort-icon {
+  opacity: 0.4;
+  vertical-align: middle;
+  margin-left: 2px;
+  transition: opacity 0.15s;
+}
+.sortable-th:hover .sort-icon {
+  opacity: 0.8;
+}
+</style>

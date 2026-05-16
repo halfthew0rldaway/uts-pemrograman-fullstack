@@ -1,18 +1,13 @@
 <template>
   <div class="dashboard flex flex-col gap-4">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="font-bold mb-0" style="font-size: 1.375rem; letter-spacing: -0.03em">Dashboard</h1>
-        <p class="text-secondary" style="font-size: 0.75rem">{{ today }}</p>
-      </div>
+    <div class="flex justify-end mb-4">
       <VaButton preset="secondary" icon="mso-refresh" size="small" :loading="isLoading" @click="loadData">
         Refresh
       </VaButton>
     </div>
 
     <!-- KPI Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
       <VaCard v-for="card in kpiCards" :key="card.label" class="kpi-card">
         <VaCardContent class="kpi-content-sm">
           <div class="flex items-start justify-between mb-2">
@@ -40,7 +35,7 @@
           <div v-if="isLoading" class="chart-loader"><VaProgressCircle indeterminate size="28px" /></div>
           <apexchart
             v-else
-            :key="'div-' + chartKey"
+            ref="divChart"
             type="bar"
             height="220"
             :options="divisionOpts"
@@ -58,7 +53,7 @@
           <div v-if="isLoading" class="chart-loader"><VaProgressCircle indeterminate size="28px" /></div>
           <apexchart
             v-else
-            :key="'sta-' + chartKey"
+            ref="staChart"
             type="donut"
             height="260"
             :options="statusOpts"
@@ -79,7 +74,7 @@
           <div v-if="isLoading" class="chart-loader"><VaProgressCircle indeterminate size="28px" /></div>
           <apexchart
             v-else
-            :key="'gen-' + chartKey"
+            ref="genChart"
             type="radialBar"
             height="260"
             :options="genderOpts"
@@ -97,7 +92,7 @@
           <div v-if="isLoading" class="chart-loader"><VaProgressCircle indeterminate size="28px" /></div>
           <apexchart
             v-else
-            :key="'rec-' + chartKey"
+            ref="recChart"
             type="area"
             height="220"
             :options="recruitmentOpts"
@@ -115,7 +110,7 @@
           <div v-if="isLoading" class="chart-loader"><VaProgressCircle indeterminate size="28px" /></div>
           <apexchart
             v-else
-            :key="'sal-' + chartKey"
+            ref="salChart"
             type="line"
             height="220"
             :options="salaryOpts"
@@ -164,16 +159,33 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { apiClient } from '../../../services/apiClient'
 import { useAuthStore } from '../../../stores/auth'
 import { useColors } from 'vuestic-ui'
+import { storeToRefs } from 'pinia'
+import { useGlobalStore } from '../../../stores/global-store'
 
 const authStore = useAuthStore()
+const globalStore = useGlobalStore()
+const { isSidebarMinimized } = storeToRefs(globalStore)
 const { currentPresetName } = useColors()
 const isDark = computed(() => currentPresetName.value === 'dark')
 const isLoading = ref(true)
 const stats = ref<any>(null)
+
+// Fire resize exactly once after sidebar CSS transition ends (220ms + 30ms buffer).
+// ApexCharts redraws cleanly when container has reached its final size.
+let resizeDebounce: ReturnType<typeof setTimeout> | null = null
+let transitionTimer: ReturnType<typeof setTimeout> | null = null
+
+watch(isSidebarMinimized, () => {
+  if (resizeDebounce) clearTimeout(resizeDebounce)
+  if (transitionTimer) clearTimeout(transitionTimer)
+  transitionTimer = setTimeout(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, 260)
+})
 
 const today = new Date().toLocaleDateString('id-ID', {
   weekday: 'long',
@@ -215,14 +227,26 @@ const kpiCards = computed(() => [
     icon: 'mso-manage_accounts',
     color: '#3B82F6',
     bg: 'rgba(59,130,246,0.1)',
-    sub: 'Akun sistem',
+    sub: 'Akun sistem aktif',
+  },
+  {
+    label: 'Total Data Aktif',
+    value: (stats.value?.summary?.activeEmployees ?? 0) + (stats.value?.summary?.totalUsers ?? 0),
+    icon: 'mso-verified',
+    color: '#8B5CF6',
+    bg: 'rgba(139,92,246,0.1)',
+    sub: 'Karyawan + User aktif',
   },
 ])
 
-const chartKey = ref(0)
+// Chart refs for direct resize
+const divChart = ref<any>(null)
+const staChart = ref<any>(null)
+const genChart = ref<any>(null)
+const recChart = ref<any>(null)
+const salChart = ref<any>(null)
 
-// Apply window.Apex global defaults — this is the ONLY reliable way to set
-// ApexCharts text color. It runs before chart render so foreColor is respected.
+// Apply window.Apex global defaults
 const applyApexDefaults = () => {
   const dark = isDark.value
   ;(window as any).Apex = {
@@ -242,7 +266,8 @@ const applyApexDefaults = () => {
 
 watch(isDark, () => {
   applyApexDefaults()
-  chartKey.value++
+  // Trigger light update instead of full re-render
+  setTimeout(patchChartLabels, 100)
 })
 
 // Shared theme-aware helpers
@@ -263,10 +288,10 @@ const centerValueFontSize = computed(() => {
 })
 
 // Belt-and-suspenders DOM patch for center labels and all chart text.
-// Uses setProperty('fill','...','important') so it doesn't wipe other inline styles.
+// Re-runs on every interaction event to counteract ApexCharts inline style resets.
 const patchChartLabels = () => {
   if (!isDark.value) return
-  setTimeout(() => {
+  const run = () => {
     // Donut/radial center label ("Total", "Gender")
     document.querySelectorAll('.apexcharts-datalabel-label').forEach((el) => {
       ;(el as SVGElement).style.setProperty('fill', '#CBD5E1', 'important')
@@ -275,20 +300,40 @@ const patchChartLabels = () => {
     document.querySelectorAll('.apexcharts-datalabel-value').forEach((el) => {
       ;(el as SVGElement).style.setProperty('fill', '#F8FAFC', 'important')
     })
-    // All SVG text nodes — set fill to light color
+    // All SVG text nodes
     document.querySelectorAll('.apexcharts-canvas text').forEach((el) => {
       ;(el as SVGElement).style.setProperty('fill', '#94A3B8', 'important')
     })
-    // Re-apply value color on top (more specific pass)
+    // Re-apply value color (more specific pass)
     document.querySelectorAll('.apexcharts-datalabel-value').forEach((el) => {
       ;(el as SVGElement).style.setProperty('fill', '#F8FAFC', 'important')
     })
-    // Legend text (HTML, uses color not fill)
+    // Re-apply label color
+    document.querySelectorAll('.apexcharts-datalabel-label').forEach((el) => {
+      ;(el as SVGElement).style.setProperty('fill', '#CBD5E1', 'important')
+    })
+    // Legend text
     document.querySelectorAll('.apexcharts-legend-text').forEach((el) => {
       ;(el as HTMLElement).style.setProperty('color', '#CBD5E1', 'important')
     })
-  }, 600)
+  }
+  // Run immediately and after short delay (ApexCharts animates after interaction)
+  run()
+  setTimeout(run, 50)
+  setTimeout(run, 200)
+  setTimeout(run, 500)
 }
+
+// Shared chart events that re-patch on every user interaction
+const chartEvents = computed(() => ({
+  mounted: () => patchChartLabels(),
+  updated: () => patchChartLabels(),
+  dataPointSelection: () => patchChartLabels(),
+  dataPointMouseEnter: () => patchChartLabels(),
+  dataPointMouseLeave: () => patchChartLabels(),
+  legendClick: () => patchChartLabels(),
+  mouseMove: () => patchChartLabels(),
+}))
 
 // Division vertical bar — 8 distinct cool-tone colors (blue/teal/indigo/cyan family)
 const BAR_PALETTE = ['#2EC4B6', '#6366F1', '#38BDF8', '#3B82F6', '#34D399', '#818CF8', '#22D3EE', '#60A5FA']
@@ -360,9 +405,8 @@ const statusOpts = computed(() => ({
     type: 'donut',
     fontFamily: 'Inter, sans-serif',
     background: 'transparent',
-    // Do NOT set foreColor here — it overrides explicit label colors below
     animations: { speed: 500 },
-    events: { mounted: () => patchChartLabels(), updated: () => patchChartLabels() },
+    events: chartEvents.value,
   },
   labels: (stats.value?.statusStats || []).map((d: any) => d.status),
   colors: ['#10B981', '#F59E0B', '#EF4444'],
@@ -430,9 +474,8 @@ const genderOpts = computed(() => ({
     type: 'radialBar',
     fontFamily: 'Inter, sans-serif',
     background: 'transparent',
-    // Do NOT set foreColor — it overrides explicit label colors below
     animations: { enabled: true, speed: 700, animateGradually: { enabled: true, delay: 150 } },
-    events: { mounted: () => patchChartLabels(), updated: () => patchChartLabels() },
+    events: chartEvents.value,
   },
   colors: ['#6366F1', '#EC4899'],
   plotOptions: {
@@ -666,12 +709,18 @@ watch(
   },
 )
 
+const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null)
+
 onMounted(async () => {
-  // Set window.Apex BEFORE charts render — this is the global default foreColor
   applyApexDefaults()
   await loadData()
-  // Patch center labels after charts finish animating
   setTimeout(patchChartLabels, 500)
+  // Auto-refresh setiap 30 detik agar data terbaru selalu sinkron
+  refreshInterval.value = setInterval(loadData, 30_000)
+})
+
+onUnmounted(() => {
+  if (refreshInterval.value) clearInterval(refreshInterval.value)
 })
 </script>
 

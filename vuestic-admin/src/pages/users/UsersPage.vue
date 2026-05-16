@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-      <div>
-        <h1 class="page-title font-bold">Manajemen User</h1>
-        <p class="text-secondary text-sm mt-1">Kelola akun login sistem</p>
-      </div>
+    <div class="flex justify-end mb-4">
       <VaButton icon="mso-add" size="small" @click="openModal()">Tambah User</VaButton>
     </div>
 
@@ -147,6 +143,7 @@
       v-model="showDeleteModal"
       title="Konfirmasi Hapus"
       ok-text="Ya, Hapus"
+      ok-color="danger"
       cancel-text="Batal"
       :ok-loading="isDeleting"
       @ok="doDelete"

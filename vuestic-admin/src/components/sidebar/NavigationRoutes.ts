@@ -38,8 +38,8 @@ export default {
     },
     {
       name: 'settings',
-      displayName: 'menu.settings',
-      meta: { icon: 'mso-settings' },
+      displayName: 'menu.about',
+      meta: { icon: 'mso-info' },
     },
   ] as INavigationRoute[],
 }

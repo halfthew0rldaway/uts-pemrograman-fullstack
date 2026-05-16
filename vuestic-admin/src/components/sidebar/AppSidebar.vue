@@ -19,23 +19,31 @@
             role="button"
             hover-opacity="0.10"
           >
-            <VaSidebarItemContent :class="minimized ? 'py-3 justify-center' : 'py-3 pr-2 pl-4'">
+            <!-- Custom content: icon always at fixed left, text fades -->
+            <div class="sidebar-row py-3">
               <VaIcon
                 v-if="route.meta.icon"
                 aria-hidden="true"
                 :name="route.meta.icon"
                 size="20px"
                 :color="iconColor(route)"
+                class="sidebar-row__icon"
               />
-              <VaSidebarItemTitle v-if="!minimized" class="flex justify-between items-center leading-5 font-semibold">
+              <span
+                class="sidebar-row__label"
+                :class="{ 'sidebar-row__label--hidden': minimized }"
+              >
                 {{ t(route.displayName) }}
-                <VaIcon v-if="route.children" :name="arrowDirection(isCollapsed)" size="20px" />
-              </VaSidebarItemTitle>
-            </VaSidebarItemContent>
+                <VaIcon v-if="route.children" :name="arrowDirection(isCollapsed)" size="16px" class="ml-1" />
+              </span>
+            </div>
           </VaSidebarItem>
         </template>
         <template #body>
-          <template v-if="!minimized">
+          <div
+            class="sidebar-children"
+            :class="{ 'sidebar-children--hidden': minimized }"
+          >
             <div v-for="(childRoute, index2) in route.children" :key="index2">
               <VaSidebarItem
                 :to="{ name: childRoute.name }"
@@ -45,26 +53,25 @@
                 :aria-label="`Visit ${t(childRoute.displayName)}`"
                 hover-opacity="0.10"
               >
-                <VaSidebarItemContent class="py-3 pr-2 pl-11">
-                  <VaSidebarItemTitle class="leading-5 font-semibold">
+                <div class="sidebar-row py-3 pl-8">
+                  <span class="sidebar-row__label" :class="{ 'sidebar-row__label--hidden': minimized }">
                     {{ t(childRoute.displayName) }}
-                  </VaSidebarItemTitle>
-                </VaSidebarItemContent>
+                  </span>
+                </div>
               </VaSidebarItem>
             </div>
-          </template>
+          </div>
         </template>
       </VaCollapse>
     </VaAccordion>
   </VaSidebar>
 </template>
+
 <script lang="ts">
 import { defineComponent, watch, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
-
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
 
 export default defineComponent({
@@ -80,7 +87,6 @@ export default defineComponent({
     const { getColor, colorToRgba } = useColors()
     const route = useRoute()
     const { t } = useI18n()
-
     const value = ref<boolean[]>([])
 
     const writableVisible = computed({
@@ -91,41 +97,93 @@ export default defineComponent({
     const isActiveChildRoute = (child: INavigationRoute) => route.name === child.name
 
     const routeHasActiveChild = (section: INavigationRoute) => {
-      if (!section.children) {
-        return route.path.endsWith(`${section.name}`)
-      }
-
+      if (!section.children) return route.path.endsWith(`${section.name}`)
       return section.children.some(({ name }) => route.path.endsWith(`${name}`))
     }
 
     const setActiveExpand = () =>
-      (value.value = navigationRoutes.routes.map((route: INavigationRoute) => routeHasActiveChild(route)))
+      (value.value = navigationRoutes.routes.map((r: INavigationRoute) => routeHasActiveChild(r)))
 
     const sidebarWidth = computed(() => (props.mobile ? '100vw' : '280px'))
     const color = computed(() => getColor('background-secondary'))
     const activeColor = computed(() => colorToRgba(getColor('focus'), 0.1))
-
-    const iconColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'secondary')
-    const textColor = (route: INavigationRoute) => (routeHasActiveChild(route) ? 'primary' : 'textPrimary')
+    const iconColor = (r: INavigationRoute) => (routeHasActiveChild(r) ? 'primary' : 'secondary')
+    const textColor = (r: INavigationRoute) => (routeHasActiveChild(r) ? 'primary' : 'textPrimary')
     const arrowDirection = (state: boolean) => (state ? 'va-arrow-up' : 'va-arrow-down')
 
     watch(() => route.fullPath, setActiveExpand, { immediate: true })
 
     return {
-      writableVisible,
-      sidebarWidth,
-      value,
-      color,
-      activeColor,
-      navigationRoutes,
-      routeHasActiveChild,
-      isActiveChildRoute,
+      writableVisible, sidebarWidth, value, color, activeColor,
+      navigationRoutes, routeHasActiveChild, isActiveChildRoute,
       minimized: computed(() => props.minimized),
-      t,
-      iconColor,
-      textColor,
-      arrowDirection,
+      t, iconColor, textColor, arrowDirection,
     }
   },
 })
 </script>
+
+<style scoped>
+/*
+  Core idea:
+  - Icon is ALWAYS at a fixed left position (pl-4 = 1rem from left)
+  - Label fades + clips to the right of the icon
+  - No justify-center ever — icon never moves
+*/
+
+.sidebar-row {
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+  padding-right: 0.5rem;
+  width: 100%;
+  overflow: hidden;
+}
+
+.sidebar-row__icon {
+  flex-shrink: 0;
+  /* Icon stays at exact same position always */
+  width: 20px;
+  height: 20px;
+}
+
+.sidebar-row__label {
+  display: flex;
+  align-items: center;
+  margin-left: 0.875rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  /* Symmetric fade — same duration for show and hide */
+  opacity: 1;
+  max-width: 180px;
+  transition:
+    opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    max-width 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    margin-left 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-row__label--hidden {
+  opacity: 0;
+  max-width: 0;
+  margin-left: 0;
+  pointer-events: none;
+}
+
+/* Children section fades symmetrically */
+.sidebar-children {
+  overflow: hidden;
+  max-height: 500px;
+  opacity: 1;
+  transition:
+    max-height 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-children--hidden {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+</style>

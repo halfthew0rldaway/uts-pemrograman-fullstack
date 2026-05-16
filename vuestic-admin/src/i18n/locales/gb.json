@@ -45,7 +45,6 @@
     "login": "Login",
     "preferences": "Account preferences",
     "payments": "Payments",
-    "settings": "Application settings",
     "pricing-plans": "Pricing plans",
     "payment-methods": "Payment methods",
     "signup": "Signup",
@@ -58,6 +57,7 @@
     "employees": "Karyawan",
     "profile": "Profil Saya",
     "settings": "Pengaturan",
+    "about": "About",
     "logs": "Activity Log"
   },
   "messages": {

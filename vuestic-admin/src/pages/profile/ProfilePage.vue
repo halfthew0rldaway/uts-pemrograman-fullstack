@@ -1,100 +1,117 @@
 <template>
-  <div class="max-w-2xl mx-auto">
-    <h1 class="page-title font-bold">Profil Saya</h1>
+  <div class="flex flex-col gap-4">
 
     <!-- Info Card -->
-    <VaCard class="mb-4">
+    <VaCard class="mb-2">
       <VaCardContent>
-        <div class="flex items-center gap-4 mb-4">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
           <VaAvatar
             :fallback-text="authStore.user?.username?.charAt(0)?.toUpperCase() || 'U'"
-            size="large"
+            size="72px"
             color="primary"
+            font-size="32px"
           />
-          <div>
-            <div class="text-xl font-bold">{{ authStore.user?.full_name || authStore.user?.username }}</div>
-            <div class="text-secondary text-sm">{{ authStore.user?.email }}</div>
-            <div class="flex gap-2 mt-1">
+          <div class="flex-1">
+            <div class="text-2xl font-bold mb-1">{{ authStore.user?.full_name || authStore.user?.username }}</div>
+            <div class="text-secondary flex items-center gap-2 mb-2">
+              <VaIcon name="mso-mail" size="16px" />
+              {{ authStore.user?.email }}
+            </div>
+            <div class="flex gap-2">
               <VaBadge
                 :text="authStore.user?.role || ''"
                 :color="authStore.user?.role === 'Admin' ? 'primary' : 'secondary'"
               />
+              <VaBadge
+                :text="authStore.user?.status || ''"
+                :color="authStore.user?.status === 'Active' ? 'success' : 'warning'"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full md:w-auto p-4 rounded-xl bg-backgroundElement border border-backgroundBorder">
+            <div>
+              <div class="text-secondary text-[10px] uppercase font-bold tracking-wider mb-1 opacity-60">Divisi</div>
+              <div class="font-semibold text-sm">{{ authStore.user?.division || '—' }}</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[10px] uppercase font-bold tracking-wider mb-1 opacity-60">Jabatan</div>
+              <div class="font-semibold text-sm">{{ authStore.user?.position || '—' }}</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[10px] uppercase font-bold tracking-wider mb-1 opacity-60">Login Terakhir</div>
+              <div class="font-semibold text-sm">{{ formatDate(authStore.user?.last_login) }}</div>
+            </div>
+            <div>
+              <div class="text-secondary text-[10px] uppercase font-bold tracking-wider mb-1 opacity-60">ID Karyawan</div>
+              <div class="font-semibold text-sm text-primary">#{{ authStore.user?.employee_id || '—' }}</div>
             </div>
           </div>
         </div>
-
-        <div class="grid grid-cols-2 gap-3 text-sm p-3 rounded-lg bg-gray-50" style="background: rgba(0, 0, 0, 0.03)">
-          <div>
-            <div class="text-secondary text-xs mb-1">Divisi</div>
-            <div class="font-medium">{{ authStore.user?.division || '—' }}</div>
-          </div>
-          <div>
-            <div class="text-secondary text-xs mb-1">Jabatan</div>
-            <div class="font-medium">{{ authStore.user?.position || '—' }}</div>
-          </div>
-          <div>
-            <div class="text-secondary text-xs mb-1">Login Terakhir</div>
-            <div class="font-medium">{{ formatDate(authStore.user?.last_login) }}</div>
-          </div>
-          <div>
-            <div class="text-secondary text-xs mb-1">Status Akun</div>
-            <div class="font-medium">{{ authStore.user?.status || '—' }}</div>
-          </div>
-        </div>
       </VaCardContent>
     </VaCard>
 
-    <!-- Update Info -->
-    <VaCard class="mb-4">
-      <VaCardTitle>Perbarui Informasi Akun</VaCardTitle>
-      <VaCardContent>
-        <div class="flex flex-col gap-4">
-          <VaInput v-model="profileForm.username" label="Username" placeholder="Username login" />
-          <VaInput v-model="profileForm.email" label="Email" type="email" placeholder="Email akun" />
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <!-- Update Info -->
+      <VaCard>
+        <VaCardTitle class="flex items-center gap-2">
+          <VaIcon name="mso-manage_accounts" color="primary" />
+          Perbarui Informasi Akun
+        </VaCardTitle>
+        <VaCardContent>
+          <div class="flex flex-col gap-4">
+            <VaInput v-model="profileForm.username" label="Username" placeholder="Username login" class="w-full" />
+            <VaInput v-model="profileForm.email" label="Email" type="email" placeholder="Email akun" class="w-full" />
 
-          <VaAlert v-if="profileSuccess" color="success" class="mt-1">{{ profileSuccess }}</VaAlert>
-          <VaAlert v-if="profileError" color="danger" class="mt-1">{{ profileError }}</VaAlert>
+            <VaAlert v-if="profileSuccess" color="success" class="mt-1" dense>{{ profileSuccess }}</VaAlert>
+            <VaAlert v-if="profileError" color="danger" class="mt-1" dense>{{ profileError }}</VaAlert>
 
-          <div class="flex justify-end">
-            <VaButton :loading="isSavingProfile" @click="saveProfile"> Simpan Perubahan </VaButton>
+            <div class="flex justify-end mt-2">
+              <VaButton :loading="isSavingProfile" @click="saveProfile"> Simpan Perubahan </VaButton>
+            </div>
           </div>
-        </div>
-      </VaCardContent>
-    </VaCard>
+        </VaCardContent>
+      </VaCard>
 
-    <!-- Change Password -->
-    <VaCard>
-      <VaCardTitle>Ganti Password</VaCardTitle>
-      <VaCardContent>
-        <div class="flex flex-col gap-4">
-          <VaInput
-            v-model="passwordForm.currentPassword"
-            label="Password Lama"
-            type="password"
-            placeholder="Masukkan password lama"
-          />
-          <VaInput
-            v-model="passwordForm.newPassword"
-            label="Password Baru"
-            type="password"
-            placeholder="Minimal 8 karakter"
-          />
-          <VaInput
-            v-model="passwordForm.confirmPassword"
-            label="Konfirmasi Password Baru"
-            type="password"
-            placeholder="Ulangi password baru"
-          />
+      <!-- Change Password -->
+      <VaCard>
+        <VaCardTitle class="flex items-center gap-2">
+          <VaIcon name="mso-lock" color="primary" />
+          Ganti Password
+        </VaCardTitle>
+        <VaCardContent>
+          <div class="flex flex-col gap-4">
+            <VaInput
+              v-model="passwordForm.currentPassword"
+              label="Password Lama"
+              type="password"
+              placeholder="Masukkan password lama"
+            />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <VaInput
+                v-model="passwordForm.newPassword"
+                label="Password Baru"
+                type="password"
+                placeholder="Minimal 8 karakter"
+              />
+              <VaInput
+                v-model="passwordForm.confirmPassword"
+                label="Konfirmasi Password"
+                type="password"
+                placeholder="Ulangi password"
+              />
+            </div>
 
-          <VaAlert v-if="passwordSuccess" color="success" class="mt-1">{{ passwordSuccess }}</VaAlert>
-          <VaAlert v-if="passwordError" color="danger" class="mt-1">{{ passwordError }}</VaAlert>
+            <VaAlert v-if="passwordSuccess" color="success" class="mt-1" dense>{{ passwordSuccess }}</VaAlert>
+            <VaAlert v-if="passwordError" color="danger" class="mt-1" dense>{{ passwordError }}</VaAlert>
 
-          <div class="flex justify-end">
-            <VaButton :loading="isSavingPassword" @click="savePassword"> Ganti Password </VaButton>
+            <div class="flex justify-end mt-2">
+              <VaButton :loading="isSavingPassword" @click="savePassword"> Ganti Password </VaButton>
+            </div>
           </div>
-        </div>
-      </VaCardContent>
-    </VaCard>
+        </VaCardContent>
+      </VaCard>
+    </div>
   </div>
 </template>
 

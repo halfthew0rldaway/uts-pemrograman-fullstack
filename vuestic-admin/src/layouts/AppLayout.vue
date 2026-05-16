@@ -9,17 +9,22 @@
     </template>
 
     <template #left>
-      <AppSidebar
-        :minimized="isSidebarMinimized"
-        :visible="!isMobile || !isSidebarMinimized"
-        :animated="!isMobile"
-        :mobile="isMobile"
-        @update:visible="
-          (v) => {
-            if (!v) isSidebarMinimized = true
-          }
-        "
-      />
+      <div
+        class="sidebar-hover-zone"
+        @mouseenter="onSidebarMouseEnter"
+        @mouseleave="onSidebarMouseLeave"
+      >
+        <AppSidebar
+          :minimized="isSidebarMinimized"
+          :visible="!isMobile || !isSidebarMinimized"
+          :mobile="isMobile"
+          @update:visible="
+            (v) => {
+              if (!v) isSidebarMinimized = true
+            }
+          "
+        />
+      </div>
     </template>
 
     <template #content>
@@ -31,7 +36,11 @@
       <AppLayoutNavigation v-if="!isMobile" class="px-4 pt-3 pb-0" />
       <main class="px-4 pt-0 pb-3">
         <article>
-          <RouterView />
+          <RouterView v-slot="{ Component }">
+            <Transition name="page-fade" mode="out-in">
+              <component :is="Component" />
+            </Transition>
+          </RouterView>
         </article>
       </main>
     </template>
@@ -51,7 +60,6 @@ import AppNavbar from '../components/navbar/AppNavbar.vue'
 import AppSidebar from '../components/sidebar/AppSidebar.vue'
 
 const GlobalStore = useGlobalStore()
-
 const breakpoints = useBreakpoint()
 
 const sidebarWidth = ref('16rem')
@@ -61,12 +69,45 @@ const isMobile = ref(false)
 const isTablet = ref(false)
 const { isSidebarMinimized } = storeToRefs(GlobalStore)
 
+// Default: sidebar minimized (icon-only mode)
+isSidebarMinimized.value = true
+
+// Hover-to-expand — use longer delay to feel deliberate, not twitchy
+const hoverTimer = ref(null)
+const collapseTimer = ref(null)
+
+const onSidebarMouseEnter = () => {
+  if (isMobile.value) return
+  // Cancel any pending collapse
+  if (collapseTimer.value) {
+    clearTimeout(collapseTimer.value)
+    collapseTimer.value = null
+  }
+  // Small delay before expanding to avoid accidental triggers
+  hoverTimer.value = setTimeout(() => {
+    isSidebarMinimized.value = false
+  }, 80)
+}
+
+const onSidebarMouseLeave = () => {
+  if (isMobile.value) return
+  // Cancel any pending expand
+  if (hoverTimer.value) {
+    clearTimeout(hoverTimer.value)
+    hoverTimer.value = null
+  }
+  // Longer delay before collapsing — feels more stable
+  collapseTimer.value = setTimeout(() => {
+    isSidebarMinimized.value = true
+  }, 300)
+}
+
 const onResize = () => {
-  isSidebarMinimized.value = breakpoints.mdDown
   isMobile.value = breakpoints.smDown
   isTablet.value = breakpoints.mdDown
   sidebarMinimizedWidth.value = '4.5rem'
   sidebarWidth.value = isTablet.value ? '100%' : '16rem'
+  if (isMobile.value) isSidebarMinimized.value = true
 }
 
 onMounted(() => {
@@ -76,11 +117,12 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
+  if (hoverTimer.value) clearTimeout(hoverTimer.value)
+  if (collapseTimer.value) clearTimeout(collapseTimer.value)
 })
 
 onBeforeRouteUpdate(() => {
   if (breakpoints.mdDown) {
-    // Collapse sidebar after route change for Mobile
     isSidebarMinimized.value = true
   }
 })
@@ -93,9 +135,35 @@ const onCloseSidebarButtonClick = () => {
 </script>
 
 <style lang="scss" scoped>
-// Prevent icon jump on animation
-.va-sidebar {
-  width: unset !important;
-  min-width: unset !important;
+.sidebar-hover-zone {
+  height: 100%;
+  display: flex;
+  // Extend hover area slightly to prevent accidental collapse
+  // when moving mouse from sidebar to content
+}
+
+// Override VaSidebar's internal transition for smoothness
+:deep(.va-sidebar) {
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: width;
+  overflow: hidden !important;
+}
+
+// Prevent VaSidebar content from jumping during transition
+:deep(.va-sidebar__content) {
+  transition: none !important;
+  overflow: hidden !important;
+}
+
+// Prevent sidebar items from wrapping during transition
+:deep(.va-sidebar-item-content) {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+// Prevent title text from causing layout shift
+:deep(.va-sidebar-item__title) {
+  overflow: hidden;
+  white-space: nowrap;
 }
 </style>

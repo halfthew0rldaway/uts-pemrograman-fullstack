@@ -5,10 +5,10 @@
  * @returns {{ limit: number, offset: number, page: number, pageSize: number }}
  */
 export const getPagination = (page = 1, pageSize = 10) => {
-  const limit = Math.max(1, parseInt(pageSize))
-  const currentPage = Math.max(1, parseInt(page))
+  const limit = Math.max(1, parseInt(pageSize) || 10)
+  const currentPage = Math.max(1, parseInt(page) || 1)
   const offset = (currentPage - 1) * limit
-  return { limit, offset, page: currentPage, pageSize: limit }
+  return { limit: Number(limit), offset: Number(offset), page: currentPage, pageSize: limit }
 }
 
 /**

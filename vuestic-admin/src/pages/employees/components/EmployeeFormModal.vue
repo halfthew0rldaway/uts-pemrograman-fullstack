@@ -40,7 +40,7 @@
         :options="['Male', 'Female']"
         :rules="[validators.required]"
       />
-      <VaDateInput v-model="formData.birth_date" label="Tanggal Lahir *" :rules="[validators.required]" manual-input />
+      <VaDateInput v-model="formData.birth_date" label="Tanggal Lahir *" :rules="[validators.required]" />
       <VaSelect
         v-model="formData.marital_status"
         label="Status Pernikahan *"
@@ -128,7 +128,6 @@
         v-model="formData.join_date"
         label="Tanggal Bergabung *"
         :rules="[validators.required]"
-        manual-input
       />
       <VaSelect
         v-model="formData.employment_status"
@@ -152,6 +151,19 @@
       />
     </VaForm>
 
+    <!-- Error Alert — tampil di dalam modal, tidak hilang otomatis -->
+    <VaAlert
+      v-if="errorMessage"
+      color="danger"
+      border="left"
+      class="mt-3"
+      closeable
+      @close="errorMessage = ''"
+    >
+      <div class="font-semibold text-sm mb-1">Gagal menyimpan data karyawan</div>
+      <div class="text-sm">{{ errorMessage }}</div>
+    </VaAlert>
+
     <template #footer>
       <div class="flex gap-3 justify-end">
         <VaButton preset="secondary" @click="$emit('close')">Batal</VaButton>
@@ -165,22 +177,22 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed, watch } from 'vue'
-import { useForm, useToast } from 'vuestic-ui'
+import { useForm } from 'vuestic-ui'
 import { validators } from '../../../services/utils'
 import { useEmployeeStore, type Employee } from '../../../stores/employee'
 
 const props = defineProps<{ employee: Employee | null }>()
-const emit = defineEmits<{ close: []; saved: [] }>()
+const emit = defineEmits<{ close: []; saved: [name: string] }>()
 
 const employeeStore = useEmployeeStore()
 const { validate } = useForm('form')
-const { init: toast } = useToast()
 
 const apiBase = 'http://localhost:5000'
 const isOpen = ref(true)
 const isSaving = ref(false)
 const photoFile = ref<File | null>(null)
 const photoPreview = ref<string | null>(null)
+const errorMessage = ref('')
 const isEdit = computed(() => !!props.employee)
 
 // Custom validation rules
@@ -196,7 +208,7 @@ const salaryRule = (v: string | number) => {
 const formData = reactive({
   full_name: '',
   gender: 'Male' as 'Male' | 'Female',
-  birth_date: '',
+  birth_date: null as Date | null,
   email: '',
   phone_number: '',
   address: '',
@@ -206,7 +218,7 @@ const formData = reactive({
   division: '',
   position: '',
   salary: '',
-  join_date: '',
+  join_date: null as Date | null,
   employment_status: 'Active' as 'Active' | 'Inactive' | 'Resigned',
   emergency_contact: '',
   emergency_phone: '',
@@ -221,8 +233,8 @@ watch(
       Object.assign(formData, {
         ...emp,
         salary: String(emp.salary),
-        birth_date: emp.birth_date ? emp.birth_date.split('T')[0] : '',
-        join_date: emp.join_date ? emp.join_date.split('T')[0] : '',
+        birth_date: emp.birth_date ? new Date(emp.birth_date) : null,
+        join_date: emp.join_date ? new Date(emp.join_date) : null,
       })
     }
   },
@@ -252,12 +264,18 @@ const onPhotoChange = (e: Event) => {
 
 const submit = async () => {
   if (!validate()) return
+  errorMessage.value = ''
   isSaving.value = true
 
   try {
     const fd = new FormData()
     Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null && value !== undefined) fd.append(key, String(value))
+      if (value === null || value === undefined) return
+      if (value instanceof Date) {
+        fd.append(key, value.toISOString().split('T')[0])
+      } else {
+        fd.append(key, String(value))
+      }
     })
     if (photoFile.value) fd.append('profile_photo', photoFile.value)
 
@@ -266,12 +284,21 @@ const submit = async () => {
     } else {
       await employeeStore.createEmployee(fd)
     }
-    emit('saved')
+    emit('saved', formData.full_name)
   } catch (e: any) {
-    toast({
-      message: e.response?.data?.message || 'Gagal menyimpan data',
-      color: 'danger',
-    })
+    const serverMsg = e.response?.data?.message
+    const status = e.response?.status
+
+    // Buat pesan error yang informatif berdasarkan konteks
+    if (serverMsg) {
+      errorMessage.value = serverMsg
+    } else if (status === 409) {
+      errorMessage.value = 'Email sudah digunakan oleh karyawan lain.'
+    } else if (status === 400) {
+      errorMessage.value = 'Data tidak valid. Periksa kembali semua field yang diisi.'
+    } else {
+      errorMessage.value = 'Terjadi kesalahan pada server. Coba lagi beberapa saat.'
+    }
   } finally {
     isSaving.value = false
   }

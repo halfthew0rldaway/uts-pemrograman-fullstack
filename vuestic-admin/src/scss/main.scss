@@ -21,6 +21,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
 
+  // Smooth theme switching
+  transition: background-color 0.3s ease, color 0.3s ease;
+
   --va-checkbox-font-size: 0.875rem;
   --va-card-box-shadow: none;
   --va-card-padding: 1.25rem;
@@ -569,14 +572,34 @@ pre {
       fill: #cbd5e1 !important;
     }
 
-    // Radial / donut center label
+    // Radial / donut center label — use [style] to beat ApexCharts inline overrides on interaction
     .apexcharts-datalabel-label,
-    .apexcharts-pie-label {
+    .apexcharts-datalabel-label[style],
+    .apexcharts-pie-label,
+    .apexcharts-pie-label[style] {
       fill: #94a3b8 !important;
     }
 
-    .apexcharts-datalabel-value {
+    // Center value number — must stay visible after click/hover
+    .apexcharts-datalabel-value,
+    .apexcharts-datalabel-value[style] {
       fill: #f8fafc !important;
+    }
+
+    // ApexCharts sets display:none on center labels when a segment is selected
+    // Force them to always be visible
+    .apexcharts-pie .apexcharts-datalabels-group,
+    .apexcharts-datalabels-group {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    .apexcharts-datalabels-group text,
+    .apexcharts-datalabels-group text[style] {
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
     }
 
     // ---- DONUT chart: kill white ring between segments ----
@@ -677,4 +700,136 @@ pre {
       background: #374151;
     }
   }
+}
+
+/* ============================================================
+   PREMIUM ANIMATIONS & TRANSITIONS
+   ============================================================ */
+
+/* 1. Page Transitions (RouterView) */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* 2. Global Card Entry */
+.va-card {
+  // Use a more performant entry animation only once
+  animation: cardFadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 3. Modal Animation Enhancements */
+.va-modal {
+  &__dialog {
+    animation: modalScaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  &__overlay {
+    backdrop-filter: blur(4px);
+    transition: backdrop-filter 0.3s ease;
+  }
+}
+
+@keyframes modalScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* 4. Interactive Elements (Buttons & Inputs) */
+.va-button {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease !important;
+  
+  &:active {
+    transform: scale(0.96) !important;
+  }
+}
+
+.va-input-wrapper {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:focus-within {
+    transform: translateY(-1px);
+  }
+}
+
+/* 5. List/Table Item Hover */
+.va-table--hoverable tbody tr {
+  transition: background-color 0.2s ease !important;
+  
+  &:hover {
+    background-color: var(--va-background-element) !important;
+  }
+}
+
+/* ============================================================
+   Sidebar smooth transition
+   Icon stays fixed, label fades — both directions identical
+   ============================================================ */
+
+// Main sidebar container — CSS-driven width transition
+.va-sidebar {
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: width;
+  overflow: hidden !important;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+// Inner scroll container — fixed wide width, sidebar clips it
+.va-sidebar__content {
+  transition: none !important;
+  overflow: hidden !important;
+  width: 280px !important;
+}
+
+// Remove VaSidebar's own justify-center on minimized
+// Our .sidebar-row handles alignment
+.va-sidebar-item-content {
+  padding: 0 !important;
+  justify-content: flex-start !important;
+}
+
+// VaLayout left panel — match sidebar width transition
+.va-layout__area--left {
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: width;
+}
+
+// VaLayout content area — sync padding shift with sidebar
+.va-layout__area--content {
+  transition: padding-left 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  will-change: padding-left;
+}
+
+// Prevent ApexCharts resize artifacts during sidebar transition
+.apexcharts-canvas,
+.apexcharts-svg {
+  transition: none !important;
 }
