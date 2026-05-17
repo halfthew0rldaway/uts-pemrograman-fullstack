@@ -182,7 +182,7 @@ Dibangun sebagai pemenuhan tugas UTS mata kuliah Pemrograman Fullstack dengan me
 ## Struktur Direktori
 
 ```
-uts-pemrograman-fullstack2/
+uts-pemrograman-fullstack/
 ├── backend/                          # Express.js API Server
 │   ├── config/
 │   │   ├── db.js                     # MySQL connection pool
@@ -267,7 +267,7 @@ Pastikan perangkat lunak berikut sudah terinstal:
 
 ```bash
 git clone <repository-url>
-cd uts-pemrograman-fullstack2
+cd uts-pemrograman-fullstack
 ```
 
 ### 2. Setup Database
