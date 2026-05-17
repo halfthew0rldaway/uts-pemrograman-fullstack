@@ -34,14 +34,14 @@ ON DUPLICATE KEY UPDATE updated_at = CURRENT_TIMESTAMP;
 -- ------------------------------------------------------------
 -- Seed: Users (terhubung ke beberapa karyawan)
 -- Password semua: Karyawan@123
--- Hash: $2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi (bcrypt rounds=12)
+-- Hash: $2b$12$MIKs1k/zOvm/8.L0MrANfOQJ10E6GSeGwhl2VjUJc8XEsDswYIIwa (bcrypt rounds=12)
 -- ------------------------------------------------------------
 INSERT INTO users (employee_id, username, email, password, role, status)
 SELECT
   e.id,
   LOWER(REPLACE(SUBSTRING_INDEX(e.full_name, ' ', 1), ' ', '')) AS username,
   e.email,
-  '$2b$12$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+  '$2b$12$MIKs1k/zOvm/8.L0MrANfOQJ10E6GSeGwhl2VjUJc8XEsDswYIIwa',
   'Employee',
   'Active'
 FROM employees e

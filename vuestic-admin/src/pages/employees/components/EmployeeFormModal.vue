@@ -176,20 +176,23 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed, watch } from 'vue'
-import { useForm } from 'vuestic-ui'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { useForm, useToast } from 'vuestic-ui'
 import { validators } from '../../../services/utils'
 import { useEmployeeStore, type Employee } from '../../../stores/employee'
+import { apiClient } from '../../../services/apiClient'
 
 const props = defineProps<{ employee: Employee | null }>()
 const emit = defineEmits<{ close: []; saved: [name: string] }>()
 
 const employeeStore = useEmployeeStore()
 const { validate } = useForm('form')
+const { init: toast } = useToast()
 
 const apiBase = 'http://localhost:5000'
 const isOpen = ref(true)
 const isSaving = ref(false)
+const isLoadingData = ref(false)
 const photoFile = ref<File | null>(null)
 const photoPreview = ref<string | null>(null)
 const errorMessage = ref('')
@@ -226,20 +229,30 @@ const formData = reactive({
   marital_status: 'Single' as 'Single' | 'Married',
 })
 
-watch(
-  () => props.employee,
-  (emp) => {
-    if (emp) {
-      Object.assign(formData, {
-        ...emp,
-        salary: String(emp.salary),
-        birth_date: emp.birth_date ? new Date(emp.birth_date) : null,
-        join_date: emp.join_date ? new Date(emp.join_date) : null,
-      })
+const populateForm = (emp: any) => {
+  Object.assign(formData, {
+    ...emp,
+    salary: String(emp.salary),
+    birth_date: emp.birth_date ? new Date(emp.birth_date) : null,
+    join_date: emp.join_date ? new Date(emp.join_date) : null,
+  })
+}
+
+onMounted(async () => {
+  if (props.employee) {
+    // Fetch full detail from API to get all fields (list API doesn't return everything)
+    isLoadingData.value = true
+    try {
+      const { data } = await apiClient.get(`/employees/${props.employee.id}`)
+      populateForm(data.data)
+    } catch {
+      // Fallback to whatever data we have from the list
+      populateForm(props.employee)
+    } finally {
+      isLoadingData.value = false
     }
-  },
-  { immediate: true },
-)
+  }
+})
 
 const triggerPhotoUpload = () => {
   document.getElementById('photo-upload')?.click()
@@ -272,7 +285,10 @@ const submit = async () => {
     Object.entries(formData).forEach(([key, value]) => {
       if (value === null || value === undefined) return
       if (value instanceof Date) {
-        fd.append(key, value.toISOString().split('T')[0])
+        const y = value.getFullYear()
+        const m = String(value.getMonth() + 1).padStart(2, '0')
+        const d = String(value.getDate()).padStart(2, '0')
+        fd.append(key, `${y}-${m}-${d}`)
       } else {
         fd.append(key, String(value))
       }

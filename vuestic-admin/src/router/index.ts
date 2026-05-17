@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 
 import AuthLayout from '../layouts/AuthLayout.vue'
 import AppLayout from '../layouts/AppLayout.vue'
+import { useAuthStore } from '../stores/auth'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -29,6 +30,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'users',
         path: 'users',
         component: () => import('../pages/users/UsersPage.vue'),
+        meta: { requiresAuth: true, adminOnly: true },
       },
       {
         name: 'profile',
@@ -39,6 +41,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'logs',
         path: 'logs',
         component: () => import('../pages/logs/ActivityLogPage.vue'),
+        meta: { requiresAuth: true, adminOnly: true },
       },
       {
         name: 'settings',
@@ -87,6 +90,7 @@ const router = createRouter({
 // Navigation guard — redirect ke login jika belum autentikasi
 router.beforeEach((to, _from, next) => {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const isAdminOnly = to.matched.some((record) => record.meta.adminOnly)
   const token = localStorage.getItem('accessToken')
 
   // Sudah login tapi akses halaman auth → redirect ke dashboard
@@ -96,6 +100,15 @@ router.beforeEach((to, _from, next) => {
 
   if (!requiresAuth) return next()
   if (!token) return next({ name: 'login' })
+
+  // Admin-only route guard
+  if (isAdminOnly) {
+    const authStore = useAuthStore()
+    if (!authStore.isAdmin) {
+      return next({ name: '404' })
+    }
+  }
+
   next()
 })
 

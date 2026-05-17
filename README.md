@@ -28,6 +28,25 @@
 
 ---
 
+## Preview
+
+<p align="center">
+  <img src="docs/screenshots/login.png" alt="Login Page" width="80%">
+  <br><em>Halaman Login dengan Google reCAPTCHA v2</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/dashboard.png" alt="Dashboard" width="80%">
+  <br><em>Dashboard — Statistik & Visualisasi Data Karyawan</em>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/employees.png" alt="Employee Management" width="80%">
+  <br><em>Manajemen Karyawan — CRUD, Filter, Export</em>
+</p>
+
+---
+
 ## Deskripsi Proyek
 
 Aplikasi web fullstack untuk mengelola data karyawan PT Digital Nusantara. Sistem ini memungkinkan administrator untuk melakukan pengelolaan data karyawan secara terpusat, termasuk pencarian data, monitoring user, serta pengamanan akses menggunakan JWT dan Session.
@@ -103,11 +122,14 @@ Dibangun sebagai pemenuhan tugas UTS mata kuliah Pemrograman Fullstack dengan me
 
 ### ✅ Authentication
 - Login dengan email & password
+- Google reCAPTCHA v2 verification (dengan toggle Dev/Live mode)
 - Logout dengan invalidasi session & token
 - JWT Authentication (access token 1 jam + refresh token 7 hari)
 - Session Login (express-session)
-- CAPTCHA bypass untuk development (`"dev"` token)
+- Forgot Password dengan token reset (dev mode: token ditampilkan langsung)
 - Route protection via Navigation Guard (Vue Router)
+- Role-Based Access Control (Admin / Employee)
+- Force logout saat password diubah
 
 ### ✅ CRUD Data Karyawan
 - Tambah karyawan baru dengan 23 kolom data
@@ -360,9 +382,12 @@ RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 
 ```env
 VITE_API_BASE_URL=/api
+VITE_RECAPTCHA_SITE_KEY=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
 ```
 
 > Frontend menggunakan Vite proxy — semua request ke `/api` akan diteruskan ke `http://localhost:5000/api` secara otomatis. Tidak perlu konfigurasi CORS tambahan di development.
+>
+> **reCAPTCHA:** Site key di atas adalah [Google Test Key](https://developers.google.com/recaptcha/docs/faq#id-like-to-run-automated-tests-with-recaptcha.-what-should-i-do) yang selalu lolos verifikasi — cocok untuk development & demo.
 
 ---
 
@@ -398,16 +423,20 @@ npm run build
 
 ## Akun Default
 
-Setelah menjalankan `schema.sql`, akun berikut tersedia:
+Setelah menjalankan `seeder.sql`, akun berikut tersedia:
 
-| Username | Email | Password | Role |
-|---|---|---|---|
-| `admin` | `admin@ptdn.com` | `Admin@123` | Admin |
-| `budi.santoso` | `budi.santoso@ptdn.com` | `Employee@123` | Employee |
-| `dewi.rahayu` | `dewi.rahayu@ptdn.com` | `Employee@123` | Employee |
-| `rizky.pratama` | `rizky.pratama@ptdn.com` | `Employee@123` | Employee |
-| `sari.indah` | `sari.indah@ptdn.com` | `Employee@123` | Employee |
-| `linda.kusuma` | `linda.kusuma@ptdn.com` | `Employee@123` | Employee |
+| Role | Email | Password |
+|---|---|---|
+| Admin | `admin@ptdigitalnusantara.com` | `Admin@123` |
+| Employee | `budi.santoso@ptdn.com` | `Karyawan@123` |
+| Employee | `dewi.rahayu@ptdn.com` | `Karyawan@123` |
+| Employee | `rizky.pratama@ptdn.com` | `Karyawan@123` |
+| Employee | `sari.indah@ptdn.com` | `Karyawan@123` |
+| Employee | `ahmad.fauzi@ptdn.com` | `Karyawan@123` |
+
+**Role-Based Access:**
+- **Admin** — Full access: Dashboard, CRUD Karyawan, Manajemen User, Activity Log, Export data
+- **Employee** — Read-only: Dashboard, lihat daftar karyawan (tanpa aksi edit/hapus), Profile
 
 > **Penting:** Ganti semua password default sebelum deployment ke production.
 

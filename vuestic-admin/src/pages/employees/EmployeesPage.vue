@@ -97,7 +97,7 @@
                   Bergabung
                   <VaIcon :name="sortIcon('join_date')" size="14px" class="sort-icon" />
                 </th>
-                <th class="text-center">Aksi</th>
+                <th v-if="authStore.isAdmin" class="text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>

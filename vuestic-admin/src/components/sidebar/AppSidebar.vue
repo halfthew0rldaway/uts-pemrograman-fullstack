@@ -7,7 +7,7 @@
     minimized-width="4.5rem"
   >
     <VaAccordion v-model="value" multiple>
-      <VaCollapse v-for="(route, index) in navigationRoutes.routes" :key="index">
+      <VaCollapse v-for="(route, index) in filteredRoutes" :key="index">
         <template #header="{ value: isCollapsed }">
           <VaSidebarItem
             :to="route.children ? undefined : { name: route.name }"
@@ -73,6 +73,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useColors } from 'vuestic-ui'
 import navigationRoutes, { type INavigationRoute } from './NavigationRoutes'
+import { useAuthStore } from '../../stores/auth'
 
 export default defineComponent({
   name: 'Sidebar',
@@ -88,6 +89,14 @@ export default defineComponent({
     const route = useRoute()
     const { t } = useI18n()
     const value = ref<boolean[]>([])
+    const authStore = useAuthStore()
+
+    // Filter routes based on role
+    const filteredRoutes = computed(() =>
+      navigationRoutes.routes.filter((r: INavigationRoute) =>
+        r.meta.adminOnly ? authStore.isAdmin : true
+      )
+    )
 
     const writableVisible = computed({
       get: () => props.visible,
@@ -102,7 +111,7 @@ export default defineComponent({
     }
 
     const setActiveExpand = () =>
-      (value.value = navigationRoutes.routes.map((r: INavigationRoute) => routeHasActiveChild(r)))
+      (value.value = filteredRoutes.value.map((r: INavigationRoute) => routeHasActiveChild(r)))
 
     const sidebarWidth = computed(() => (props.mobile ? '100vw' : '280px'))
     const color = computed(() => getColor('background-secondary'))
@@ -115,7 +124,7 @@ export default defineComponent({
 
     return {
       writableVisible, sidebarWidth, value, color, activeColor,
-      navigationRoutes, routeHasActiveChild, isActiveChildRoute,
+      filteredRoutes, routeHasActiveChild, isActiveChildRoute,
       minimized: computed(() => props.minimized),
       t, iconColor, textColor, arrowDirection,
     }

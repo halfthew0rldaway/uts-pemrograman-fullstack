@@ -71,9 +71,16 @@ export const exportToExcel = async (employees, res) => {
 export const exportToPDF = (employees, res) => {
   const doc = new PDFDocument({ margin: 40, size: 'A4', layout: 'landscape' })
 
-  res.setHeader('Content-Type', 'application/pdf')
-  res.setHeader('Content-Disposition', `attachment; filename="karyawan_${Date.now()}.pdf"`)
-  doc.pipe(res)
+  // Collect PDF into buffer
+  const chunks = []
+  doc.on('data', (chunk) => chunks.push(chunk))
+  doc.on('end', () => {
+    const pdfBuffer = Buffer.concat(chunks)
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', `attachment; filename="karyawan_${Date.now()}.pdf"`)
+    res.setHeader('Content-Length', pdfBuffer.length)
+    res.end(pdfBuffer)
+  })
 
   // Header dokumen
   doc.fontSize(16).font('Helvetica-Bold').text('PT Digital Nusantara', { align: 'center' })
@@ -85,22 +92,26 @@ export const exportToPDF = (employees, res) => {
   // Tabel sederhana
   const headers = ['No', 'Kode', 'Nama', 'Divisi', 'Jabatan', 'Status', 'Bergabung']
   const colWidths = [25, 70, 150, 100, 120, 70, 80]
-  let x = 40
-  const headerY = doc.y
+  const rowHeight = 18
+  let currentY = doc.y
 
   // Header tabel
+  let x = 40
   doc.font('Helvetica-Bold').fontSize(8)
   headers.forEach((h, i) => {
-    doc.rect(x, headerY, colWidths[i], 18).fillAndStroke('#1E3A5F', '#1E3A5F')
-    doc.fillColor('white').text(h, x + 3, headerY + 5, { width: colWidths[i] - 6 })
+    doc.rect(x, currentY, colWidths[i], rowHeight).fillAndStroke('#1E3A5F', '#1E3A5F')
+    doc.fillColor('white').text(h, x + 3, currentY + 5, { width: colWidths[i] - 6, lineBreak: false })
     x += colWidths[i]
   })
+  currentY += rowHeight
 
   // Baris data
   doc.font('Helvetica').fontSize(7).fillColor('black')
   employees.forEach((emp, idx) => {
-    if (doc.y > 520) { doc.addPage(); }
-    const rowY = doc.y + 2
+    if (currentY > 520) {
+      doc.addPage()
+      currentY = 40
+    }
     x = 40
     const rowData = [
       idx + 1,
@@ -113,12 +124,13 @@ export const exportToPDF = (employees, res) => {
     ]
     const bg = idx % 2 === 0 ? '#F5F7FA' : '#FFFFFF'
     rowData.forEach((val, i) => {
-      doc.rect(x, rowY, colWidths[i], 16).fillAndStroke(bg, '#CCCCCC')
-      doc.fillColor('black').text(String(val ?? ''), x + 3, rowY + 4, { width: colWidths[i] - 6 })
+      doc.rect(x, currentY, colWidths[i], rowHeight).fillAndStroke(bg, '#CCCCCC')
+      doc.fillColor('black').text(String(val ?? ''), x + 3, currentY + 5, { width: colWidths[i] - 6, lineBreak: false })
       x += colWidths[i]
     })
-    doc.moveDown(0.1)
+    currentY += rowHeight
   })
 
   doc.end()
 }
+

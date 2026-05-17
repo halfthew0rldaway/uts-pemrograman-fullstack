@@ -20,7 +20,7 @@ app.use(i18n)
 app.use(createVuestic({ config: vuesticGlobalConfig }))
 app.use(VueApexCharts)
 
-if (import.meta.env.VITE_APP_GTM_ENABLED) {
+if (import.meta.env.VITE_APP_GTM_ENABLED === 'true' && import.meta.env.VITE_APP_GTM_KEY) {
   app.use(
     createGtm({
       id: import.meta.env.VITE_APP_GTM_KEY,

@@ -117,7 +117,7 @@
     </div>
 
     <template #footer>
-      <div class="flex justify-between items-center">
+      <div v-if="emp" class="flex justify-between items-center">
         <div class="text-xs text-secondary">
           <span v-if="emp.profile_photo" class="flex items-center gap-1">
             <VaIcon name="mso-image" size="14px" />
@@ -129,6 +129,9 @@
           <VaButton preset="secondary" @click="$emit('close')">Tutup</VaButton>
           <VaButton v-if="authStore.isAdmin" icon="mso-edit" @click="$emit('edit', emp)">Edit</VaButton>
         </div>
+      </div>
+      <div v-else class="flex justify-end">
+        <VaButton preset="secondary" @click="$emit('close')">Tutup</VaButton>
       </div>
     </template>
 

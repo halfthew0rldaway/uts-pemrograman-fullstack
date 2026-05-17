@@ -1,7 +1,7 @@
 export interface INavigationRoute {
   name: string
   displayName: string
-  meta: { icon: string }
+  meta: { icon: string; adminOnly?: boolean }
   children?: INavigationRoute[]
 }
 
@@ -24,12 +24,12 @@ export default {
     {
       name: 'users',
       displayName: 'menu.users',
-      meta: { icon: 'mso-manage_accounts' },
+      meta: { icon: 'mso-manage_accounts', adminOnly: true },
     },
     {
       name: 'logs',
       displayName: 'menu.logs',
-      meta: { icon: 'mso-history' },
+      meta: { icon: 'mso-history', adminOnly: true },
     },
     {
       name: 'profile',

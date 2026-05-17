@@ -709,17 +709,15 @@ pre {
 /* 1. Page Transitions (RouterView) */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.15s ease;
 }
 
 .page-fade-enter-from {
   opacity: 0;
-  transform: translateY(10px);
 }
 
 .page-fade-leave-to {
   opacity: 0;
-  transform: translateY(-10px);
 }
 
 /* 2. Global Card Entry */

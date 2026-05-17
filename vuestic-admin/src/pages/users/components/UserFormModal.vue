@@ -49,13 +49,17 @@
 <script lang="ts" setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { useForm, useToast } from 'vuestic-ui'
+import { useRouter } from 'vue-router'
 import { validators } from '../../../services/utils'
 import { useUserManagementStore, type User } from '../../../stores/userManagement'
+import { useAuthStore } from '../../../stores/auth'
 
 const props = defineProps<{ user: User | null }>()
 const emit = defineEmits<{ close: []; saved: [] }>()
 
 const store = useUserManagementStore()
+const authStore = useAuthStore()
+const router = useRouter()
 const { validate } = useForm('form')
 const { init: toast } = useToast()
 
@@ -102,6 +106,14 @@ const submit = async () => {
 
     if (isEdit.value && props.user) {
       await store.updateUser(props.user.id, payload)
+
+      // Jika password diubah dan user yang diedit adalah user yang sedang login, force logout
+      if (formData.password && props.user.id === authStore.user?.id) {
+        toast({ message: 'Password berubah. Silakan login ulang.', color: 'info' })
+        await authStore.logout()
+        router.replace({ name: 'login' })
+        return
+      }
     } else {
       await store.createUser(payload)
     }

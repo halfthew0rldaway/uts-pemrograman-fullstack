@@ -67,3 +67,9 @@ coverage/
 *.pem
 *.key
 *.cert
+
+# ─── Vuestic Boilerplate (tidak relevan) ─────────────────────
+vuestic-admin/.github/
+vuestic-admin/.husky/
+vuestic-admin/CONTRIBUTING.md
+vuestic-admin/LICENSE

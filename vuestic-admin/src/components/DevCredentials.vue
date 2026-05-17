@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="slide-up">
-      <div v-if="isDev && isVisible" class="dev-creds-wrapper">
+      <div v-if="isVisible" class="dev-creds-wrapper">
         <!-- Header -->
         <div class="dev-creds-header">
           <div class="flex items-center gap-2">
-            <span class="dev-badge">DEV</span>
-            <span class="dev-creds-title">Test Credentials</span>
+            <span class="dev-badge">TEST</span>
+            <span class="dev-creds-title">Akun Login</span>
           </div>
           <button class="dev-close-btn" aria-label="Tutup" @click="isVisible = false">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -18,18 +18,18 @@
         <!-- Body -->
         <div class="dev-creds-body">
           <div
-            v-for="item in credentials"
-            :key="item.label"
+            v-for="(item, idx) in credentials"
+            :key="idx"
             class="dev-cred-item"
-            :title="`Klik untuk menyalin ${item.label}`"
-            @click="copy(item.value, item.label)"
+            :title="`Klik untuk menyalin ${item.value}`"
+            @click="copy(item.value, item.value)"
           >
             <span class="dev-cred-label">{{ item.label }}</span>
             <div class="dev-cred-value-wrap">
               <code class="dev-cred-value">{{ item.value }}</code>
               <span class="dev-copy-icon">
                 <svg
-                  v-if="copiedLabel !== item.label"
+                  v-if="copiedLabel !== item.value"
                   width="13"
                   height="13"
                   viewBox="0 0 24 24"
@@ -58,13 +58,6 @@
               </span>
             </div>
           </div>
-
-          <div class="dev-cred-item dev-cred-item--muted">
-            <span class="dev-cred-label">CAPTCHA</span>
-            <div class="dev-cred-value-wrap">
-              <code class="dev-cred-value dev-cred-value--muted">auto-bypass</code>
-            </div>
-          </div>
         </div>
 
         <!-- Footer hint -->
@@ -80,7 +73,7 @@
     <!-- Collapsed toggle -->
     <Transition name="fade">
       <button
-        v-if="isDev && !isVisible"
+        v-if="!isVisible"
         class="dev-toggle-btn"
         title="Tampilkan dev credentials"
         @click="isVisible = true"
@@ -106,13 +99,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-const isDev = import.meta.env.DEV
 const isVisible = ref(true)
 const copiedLabel = ref('')
 
 const credentials = [
-  { label: 'Email', value: 'admin@ptdigitalnusantara.com' },
-  { label: 'Password', value: 'Admin@123' },
+  { label: 'Admin', value: 'admin@ptdigitalnusantara.com' },
+  { label: 'Pass', value: 'Admin@123' },
+  { label: 'Employee', value: 'budi.santoso@ptdn.com' },
+  { label: 'Pass', value: 'Karyawan@123' },
 ]
 
 const copy = async (value: string, label: string) => {
